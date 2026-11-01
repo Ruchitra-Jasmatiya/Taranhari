@@ -1,11 +1,3 @@
-// =========================================================
-// Footer.jsx - links, short contact details, social icons,
-// copyright, and a tiny theme switcher (so you can try the 3
-// colour themes). Delete the <div className="footer__themes">
-// block when you have picked your favourite theme.
-//
-// Contact values come from the CONTACT object in pages/Contact.jsx.
-// =========================================================
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';

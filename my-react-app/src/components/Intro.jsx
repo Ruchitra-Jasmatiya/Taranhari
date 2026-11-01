@@ -1,18 +1,4 @@
-// =========================================================
-// Intro.jsx - full-screen welcome video shown ONCE per session.
-//
-// REPLACE: put your video at  public/videos/intro.mp4
-//          and a poster image at public/images/hero/intro-poster.jpg
-//
-// KEEP IT LIGHT (under 3 MB, 720p, no sound). Compress with ffmpeg:
-//   ffmpeg -i original.mp4 -vf scale=-2:720 -an -t 3 -crf 30 \
-//          -preset slow -movflags +faststart intro.mp4
-//
-// Rules: plays 2-3 seconds, then App slides it away. Skip button works.
-// If the video is missing, fails, or the visitor prefers reduced
-// motion, a solid brand-colour screen with a bouncing logo shows for
-// 2 seconds instead.
-// =========================================================
+
 
 import { useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';

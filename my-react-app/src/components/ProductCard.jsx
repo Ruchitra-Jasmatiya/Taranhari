@@ -1,9 +1,4 @@
-// =========================================================
-// ProductCard.jsx - one product tile.
-// Photo, veg dot, name, weight, stars, price + MRP + % off sticker,
-// wishlist heart (pops), Add to Cart (becomes a - 1 + stepper).
-// Tapping the photo or name opens Quick View via onOpen(product).
-// =========================================================
+
 
 import { useRef } from 'react';
 import { motion } from 'framer-motion';

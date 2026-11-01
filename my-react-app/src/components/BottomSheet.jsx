@@ -1,9 +1,4 @@
-// =========================================================
-// BottomSheet.jsx - slide-up panel on mobile, centered modal on
-// desktop. Used by Quick View and the Filter sheet.
-// Handles: Escape to close, click outside, focus trap, scroll lock,
-// and focus return to the button that opened it.
-// =========================================================
+
 
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
