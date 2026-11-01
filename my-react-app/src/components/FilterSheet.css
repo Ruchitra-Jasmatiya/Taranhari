@@ -1,0 +1,48 @@
+/* FilterSheet.css (chip styles come from QuickView.css, loaded with the Shop) */
+
+.fs { display: grid; gap: var(--s-5); padding-top: var(--s-2); }
+.fs__group { border: 0; margin: 0; padding: 0; }
+.fs__group legend {
+  padding: 0;
+  margin-bottom: var(--s-3);
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+.fs__chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+
+.chip--flat {
+  flex-direction: row;
+  min-height: 44px;
+  min-width: 0;
+  padding: 0 16px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+}
+
+/* Toggle switch */
+.switch { display: inline-flex; align-items: center; gap: var(--s-3); min-height: 44px; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch__track {
+  position: relative;
+  width: 60px;
+  height: 34px;
+  background: var(--white);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r-pill);
+  transition: background var(--t-fast);
+}
+.switch__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  background: var(--ink);
+  border-radius: 50%;
+  transition: transform var(--t-med) var(--ease);
+}
+.switch input:checked + .switch__track { background: var(--fresh); }
+.switch input:checked + .switch__track .switch__thumb { transform: translateX(26px); }
+.switch input:focus-visible + .switch__track { outline: 3px solid var(--ink); outline-offset: 3px; }
+.switch__label { font-weight: 600; font-size: 1.05rem; }

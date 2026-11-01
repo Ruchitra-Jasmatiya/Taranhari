@@ -1,0 +1,40 @@
+/* Stepper.css */
+.stepper {
+  display: inline-flex;
+  align-items: stretch;
+  background: var(--white);
+  color: var(--ink);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.stepper__btn {
+  width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--ink);
+  transition: transform var(--t-fast) var(--ease);
+}
+.stepper__btn:first-child { border-right: var(--line-thin) solid var(--ink); }
+.stepper__btn:last-child { border-left: var(--line-thin) solid var(--ink); }
+.stepper__btn:active:not(:disabled) { transform: scale(0.88); }
+.stepper__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.stepper__val {
+  position: relative;
+  min-width: 44px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.stepper--sm .stepper__btn { width: 44px; }
+.stepper--block { display: flex; width: 100%; }
+.stepper--block .stepper__val { flex: 1; }
+.stepper--block .stepper__btn { width: 56px; }

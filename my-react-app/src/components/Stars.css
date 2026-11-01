@@ -1,0 +1,14 @@
+/* Stars.css */
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.stars__row { display: inline-flex; gap: 1px; }
+.star { color: var(--ink); fill: transparent; }
+.star--on { fill: var(--accent); }
+/* half star: lighter fill so it reads as "in between" without gradients */
+.star--half { fill: var(--accent); opacity: 0.55; }
+.stars__count { font-weight: 400; opacity: 0.75; }

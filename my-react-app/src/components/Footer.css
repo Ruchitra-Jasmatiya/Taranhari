@@ -1,0 +1,78 @@
+/* Footer.css - dark flat band */
+
+.footer { padding-top: var(--s-8); }
+
+.footer__grid {
+  display: grid;
+  gap: var(--s-6);
+  grid-template-columns: 1fr 1fr;
+}
+.footer__brand { grid-column: 1 / -1; display: grid; gap: var(--s-4); justify-items: start; }
+.footer__tag { max-width: 36ch; font-size: 1.05rem; }
+
+.footer__col { display: grid; gap: var(--s-3); align-content: start; }
+.footer__col h3 { font-size: 1.35rem; color: var(--accent); }
+.footer__col ul { display: grid; gap: 2px; }
+.footer__col a,
+.footer__col span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  transition: color var(--t-fast);
+}
+.footer__col a:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+.footer__contact { grid-column: auto; }
+
+.footer__social { display: flex; gap: var(--s-2); flex-wrap: wrap; }
+.footer__social a {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  color: var(--ink);
+  background: var(--accent);
+  border: var(--line-thin) solid var(--on-ink);
+  border-radius: 50%;
+  box-shadow: 3px 3px 0 var(--brand);
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.footer__social a:hover { transform: translate(-2px, -2px) rotate(-6deg); box-shadow: 5px 5px 0 var(--brand); }
+.footer__social a:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--brand); }
+
+.footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-top: var(--s-7);
+  padding-block: var(--s-4);
+  border-top: var(--line-thin) solid var(--on-ink);
+  font-size: var(--fs-small);
+}
+
+.footer__themes { display: flex; align-items: center; gap: var(--s-2); }
+.footer__theme {
+  width: 44px;
+  height: 44px;
+  border: var(--line-thin) solid var(--on-ink);
+  border-radius: 50%;
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--on-ink);
+  transition: transform var(--t-fast) var(--ease);
+}
+.footer__theme:hover { transform: scale(1.08); }
+.footer__theme.is-on { background: var(--accent); color: var(--ink); }
+
+/* The mobile tab bar sits over the bottom of the page: make room */
+@media (max-width: 767px) {
+  .footer { padding-bottom: calc(var(--tab-h) + 8px); }
+}
+
+@media (min-width: 768px) {
+  .footer__grid { grid-template-columns: 1.4fr 1fr 1fr 1.4fr; gap: var(--s-7); }
+  .footer__brand { grid-column: auto; }
+}

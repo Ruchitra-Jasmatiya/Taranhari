@@ -1,0 +1,44 @@
+/* Logo.css */
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-head);
+  font-weight: 800;
+  line-height: 1;
+  --mark: 40px;
+  --word: 1.45rem;
+}
+
+.logo__mark {
+  display: grid;
+  place-items: center;
+  width: var(--mark);
+  height: var(--mark);
+  background: var(--brand);
+  color: var(--accent);
+  border: var(--line) solid var(--ink);
+  border-radius: 12px;
+  box-shadow: 2px 2px 0 var(--ink);
+  font-size: calc(var(--mark) * 0.48);
+  transform: rotate(-6deg);
+  transition: transform var(--t-med) var(--ease);
+}
+.logo-link:hover .logo__mark { transform: rotate(4deg) scale(1.06); }
+
+.logo__word { font-size: var(--word); color: var(--ink); letter-spacing: -0.02em; }
+.logo__hari { color: var(--brand); }
+
+.logo--lg { --mark: 84px; --word: 3.2rem; gap: 12px; }
+.logo--lg .logo__mark { border-width: 4px; box-shadow: 4px 4px 0 var(--ink); border-radius: 20px; }
+.logo--sm { --mark: 32px; --word: 1.2rem; }
+
+/* On dark bands the wordmark flips to light text */
+.band-ink .logo__word { color: var(--on-ink); }
+.band-ink .logo__mark { border-color: var(--on-ink); box-shadow: 2px 2px 0 var(--accent); }

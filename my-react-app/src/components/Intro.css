@@ -1,0 +1,97 @@
+/* Intro.css - full screen, solid colours only */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-intro);
+  display: grid;
+  place-items: center;
+  background: var(--brand); /* shows while the video loads, and as the fallback */
+  overflow: hidden;
+}
+
+.intro__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.intro__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--s-4);
+  justify-items: center;
+  padding: var(--s-5);
+  text-align: center;
+}
+
+/* Logo sits on a solid sticker card so it is readable over any video */
+.intro__logo {
+  padding: var(--s-4) var(--s-5);
+  background: var(--paper);
+  border: 4px solid var(--ink);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg);
+  transform: rotate(-2deg);
+  animation: intro-pop 0.7s var(--ease) both;
+}
+/* logo text is large on desktop, smaller on 360px phones */
+.intro__logo .logo--lg { --mark: 56px; --word: 2.2rem; }
+@media (min-width: 480px) {
+  .intro__logo .logo--lg { --mark: 84px; --word: 3.2rem; }
+}
+
+.intro__line {
+  padding: 0.4rem 1.2rem;
+  background: var(--accent);
+  color: var(--ink);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  animation: intro-rise 0.6s 0.35s var(--ease) both;
+}
+
+/* Fallback: a simple bounce */
+.intro--fallback .intro__logo { animation: intro-bounce 1s var(--ease) infinite alternate; }
+
+.intro__skip {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top, 0px));
+  right: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 18px;
+  background: var(--paper);
+  color: var(--ink);
+  border: var(--line) solid var(--ink);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-sm);
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 1.05rem;
+  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+.intro__skip:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); }
+.intro__skip:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+
+@keyframes intro-pop {
+  from { opacity: 0; transform: rotate(-2deg) scale(0.7); }
+  to { opacity: 1; transform: rotate(-2deg) scale(1); }
+}
+@keyframes intro-rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes intro-bounce {
+  from { transform: rotate(-2deg) translateY(0); }
+  to { transform: rotate(2deg) translateY(-18px); }
+}
