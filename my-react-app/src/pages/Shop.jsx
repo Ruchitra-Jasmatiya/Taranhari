@@ -1,11 +1,11 @@
 // =========================================================
-// Shop.jsx - Luxury Refurbished Edition
+// Shop.jsx - Luxury Category-Focused Edition
 // =========================================================
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Pause, Play, Search, SlidersHorizontal, Volume2, VolumeX, X } from 'lucide-react';
+import { ArrowLeft, Pause, Play, Search, SlidersHorizontal, Volume2, VolumeX, X } from 'lucide-react';
 import Reveal from '../components/Reveal.jsx';
 import Img from '../components/Img.jsx';
 import ProductCard from '../components/ProductCard.jsx';
@@ -13,11 +13,16 @@ import QuickView from '../components/QuickView.jsx';
 import FilterSheet, { NO_FILTERS, PRICE_RANGES, countActive } from '../components/FilterSheet.jsx';
 import BottomSheet from '../components/BottomSheet.jsx';
 import { getProducts } from '../lib/api.js';
-import { CATEGORIES } from '../data/products.js';
 import './Shop.css';
 
-// ---------- Editable content with Professional Google Unsplash URLs ----------
-const BANNER_IMAGE = 'https://images.unsplash.com/photo-1599487484170-7c9e6e4fe358?q=80&w=1600&auto=format&fit=crop';
+// ---------- Curated Google Unsplash URLs for Categories & Products ----------
+const CATEGORY_FEATURED = [
+  { name: 'Namkeen', note: 'Royal bhujia, mixes & dalmoth', img: 'https://images.unsplash.com/photo-1599487484170-7c9e6e4fe358?q=80&w=800&auto=format&fit=crop', tone: 'brand' },
+  { name: 'Khasta Puri', note: 'Flaky, golden & traditional', img: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop', tone: 'accent' },
+  { name: 'Corn Puff', note: 'Light, airy & chatpata', img: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop', tone: 'ink' },
+  { name: 'Sev', note: 'Ratlami, garlic & royal plain', img: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop', tone: 'white' },
+];
+
 const FACTORY_VIDEO = '/videos/factory.mp4';
 const FACTORY_POSTER = 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=1200&auto=format&fit=crop';
 
@@ -32,13 +37,8 @@ const CHAAT = [
   { src: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop', caption: 'Khasta kachori chaat' },
   { src: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop', caption: 'Sev puri' },
   { src: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800&auto=format&fit=crop', caption: 'Bhel' },
-  { src: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop', caption: 'Dahi papdi chaat' },
-  { src: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop', caption: 'Masala puri' },
-  { src: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop', caption: 'Sev tamatar' },
-  { src: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800&auto=format&fit=crop', caption: 'Corn puff chaat' },
 ];
 
-const TABS = ['All', ...CATEGORIES];
 const SORTS = [
   { id: 'trending', label: 'Trending' },
   { id: 'low', label: 'Price: Low to High' },
@@ -60,6 +60,7 @@ function sortList(list, sort) {
 
 export default function Shop() {
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const [all, setAll] = useState(null);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('trending');
@@ -69,7 +70,7 @@ export default function Shop() {
   const [photo, setPhoto] = useState(null);
 
   const catParam = params.get('cat');
-  const category = TABS.includes(catParam) ? catParam : 'All';
+  const category = catParam || 'All';
 
   useEffect(() => {
     let live = true;
@@ -85,11 +86,13 @@ export default function Shop() {
   };
 
   const range = PRICE_RANGES.find((r) => r.id === filters.price);
+  
+  // Results filtered and strictly limited to 8 items as requested
   const results = useMemo(() => {
     if (!all) return [];
     const q = query.trim().toLowerCase();
     const filtered = all.filter((p) => {
-      if (category !== 'All' && p.category !== category) return false;
+      if (category !== 'All' && p.category.toLowerCase() !== category.toLowerCase()) return false;
       if (q && !(p.name.toLowerCase().includes(q) || p.tags.some((t) => t.toLowerCase().includes(q)))) return false;
       if (range && (p.price < range.min || p.price > range.max)) return false;
       if (filters.veg && !p.veg) return false;
@@ -97,11 +100,10 @@ export default function Shop() {
       if (filters.packs.length && !filters.packs.includes(p.weight)) return false;
       return true;
     });
-    return sortList(filtered, sort);
+    return sortList(filtered, sort).slice(0, 8); // Strictly 8 items
   }, [all, category, query, range, filters, sort]);
 
   const activeCount = countActive(filters);
-  const hasAnyFilter = activeCount > 0 || query.trim() || category !== 'All';
 
   const resetAll = () => {
     setQuery('');
@@ -110,54 +112,51 @@ export default function Shop() {
     setCategory('All');
   };
 
-  const chips = [];
-  if (range) chips.push({ id: 'price', label: range.label, remove: () => setFilters({ ...filters, price: null }) });
-  if (filters.veg) chips.push({ id: 'veg', label: 'Veg only', remove: () => setFilters({ ...filters, veg: false }) });
-  filters.spice.forEach((s) => chips.push({ id: `s-${s}`, label: `${s} spice`, remove: () => setFilters({ ...filters, spice: filters.spice.filter((x) => x !== s) }) }));
-  filters.packs.forEach((s) => chips.push({ id: `k-${s}`, label: s, remove: () => setFilters({ ...filters, packs: filters.packs.filter((x) => x !== s) }) }));
-
-  const favourites = useMemo(
-    () => (all ? all.filter((p) => p.trending).sort((a, b) => b.reviews - a.reviews) : []),
-    [all]
-  );
-
   return (
     <div className="shop">
-      {/* ---------- Title band ---------- */}
-      <section className="shop__hero">
-        <div className="container shop__heroGrid">
-          <Reveal className="shop__heroText">
-            <span className="eyebrow">Taaza, garam, crunchy</span>
-            <h1>The Royal Snack Shelf</h1>
-            <p>Pick your crunch. Everything is fried fresh, packed fast, and sealed tight with royal tradition.</p>
-          </Reveal>
-          <Reveal className="shop__banner" delay={0.1}>
-            <Img src={BANNER_IMAGE} alt="A spread of Taran Hari namkeen and snacks" eager />
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------- Sticky category tabs ---------- */}
-      <div className="shop__tabsWrap">
+      {/* ---------- 1. HERO CATEGORY SECTION (Main Focus) ---------- */}
+      <section className="shop__hero-categories">
         <div className="container">
-          <div className="shop__tabs" role="tablist" aria-label="Snack categories">
-            {TABS.map((t) => (
-              <button
-                key={t}
-                type="button"
-                role="tab"
-                aria-selected={category === t}
-                className={`shop__tab ${category === t ? 'is-on' : ''}`}
-                onClick={() => setCategory(t)}
+          <div className="shop__back-row">
+            <button type="button" className="btn-back-page" onClick={() => navigate(-1)}>
+              <ArrowLeft size={18} strokeWidth={2.5} /> Back Previous Page
+            </button>
+          </div>
+          <div className="section-head text-center">
+            <span className="eyebrow">Explore By Category</span>
+            <h1>The Royal Snack Collection</h1>
+            <p className="section-sub">Tap any category below to immerse yourself in authentic handcrafted flavors.</p>
+          </div>
+
+          <div className="category-hero-grid">
+            {CATEGORY_FEATURED.map((cat, i) => (
+              <motion.div
+                key={cat.name}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
               >
-                {t}
-              </button>
+                <button
+                  type="button"
+                  className={`category-hero-card tile--${cat.tone} ${category === cat.name ? 'active-cat' : ''}`}
+                  onClick={() => setCategory(cat.name)}
+                >
+                  <div className="cat-card__img-wrap">
+                    <img src={cat.img} alt={cat.name} className="cat-card__img" />
+                  </div>
+                  <div className="cat-card__content">
+                    <h3>{cat.name}</h3>
+                    <p>{cat.note}</p>
+                    <span className="cat-explore-link">Explore Collection →</span>
+                  </div>
+                </button>
+              </motion.div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ---------- Controls ---------- */}
+      {/* ---------- 2. PRODUCTS SECTION (Strictly 8 items with controls) ---------- */}
       <section className="section shop__main">
         <div className="container">
           <div className="shop__controls">
@@ -193,36 +192,23 @@ export default function Shop() {
             </div>
           </div>
 
-          <div className="shop__status">
-            <p aria-live="polite">
-              <strong>{all ? results.length : '...'}</strong> {results.length === 1 ? 'snack' : 'snacks'} found
-              {category !== 'All' && <> in <strong>{category}</strong></>}
-            </p>
-            {hasAnyFilter && <button type="button" className="shop__reset" onClick={resetAll}>Reset all</button>}
+          <div className="shop__status-flex">
+            <h2>{category === 'All' ? 'Featured Selections' : `${category} Collection`}</h2>
+            {category !== 'All' && (
+              <button type="button" className="shop__reset" onClick={() => setCategory('All')}>Show All Categories</button>
+            )}
           </div>
 
-          {chips.length > 0 && (
-            <ul className="shop__chips" aria-label="Active filters">
-              {chips.map((c) => (
-                <li key={c.id}>
-                  <button type="button" className="fchip" onClick={c.remove} aria-label={`Remove filter ${c.label}`}>
-                    {c.label} <X size={14} strokeWidth={3} aria-hidden="true" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {/* ---------- Grid ---------- */}
+          {/* Grid displaying strictly 8 items */}
           {all === null ? (
             <div className="shop__grid" aria-busy="true">
-              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton" />)}
+              {Array.from({ length: 4 }).map((_, i) => <div key={i} className="skeleton" />)}
             </div>
           ) : results.length === 0 ? (
             <div className="empty">
-              <h3>Arre! Nothing matches.</h3>
-              <p>Try a different word or loosen a filter. Our snacks are shy, not missing.</p>
-              <button type="button" className="btn btn--primary" onClick={resetAll}>Reset and show all</button>
+              <h3>Arre! Nothing matches in this category.</h3>
+              <p>Try resetting filters or exploring another category.</p>
+              <button type="button" className="btn btn--primary" onClick={resetAll}>Reset and Show All</button>
             </div>
           ) : (
             <motion.div className="shop__grid" layout>
@@ -245,7 +231,7 @@ export default function Shop() {
         </div>
       </section>
 
-      {/* ---------- Factory video ---------- */}
+      {/* ---------- 3. Factory video & Customer quotes ---------- */}
       <section className="section shop__videoSec">
         <div className="container shop__videoGrid">
           <Reveal className="shop__videoText">
@@ -270,7 +256,7 @@ export default function Shop() {
         </div>
       </section>
 
-      {/* ---------- Chaat gallery ---------- */}
+      {/* ---------- 4. Chaat gallery ---------- */}
       <section className="section">
         <div className="container">
           <Reveal className="section-head text-center">
@@ -280,28 +266,13 @@ export default function Shop() {
           </Reveal>
           <div className="gallery">
             {CHAAT.map((c, i) => (
-              <Reveal key={c.caption} delay={(i % 4) * 0.07} className={`gallery__item g${i}`}>
+              <Reveal key={c.caption} delay={(i % 4) * 0.07} className="gallery__item">
                 <button type="button" className="gallery__btn" onClick={() => setPhoto(c)} aria-label={`Open photo: ${c.caption}`}>
                   <Img src={c.src} alt={c.caption} />
                   <span className="gallery__cap">{c.caption}</span>
                 </button>
               </Reveal>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- Fan favourites ---------- */}
-      <section className="section shop__fav">
-        <div className="container">
-          <Reveal className="section-head text-center">
-            <span className="eyebrow">Sab ke favourite</span>
-            <h2>Fan Favourites</h2>
-          </Reveal>
-        </div>
-        <div className="shop__scroller" tabIndex={0} aria-label="Fan favourite snacks, scroll sideways">
-          <div className="shop__scrollInner">
-            {favourites.map((p) => <ProductCard key={p.id} product={p} onOpen={setQuick} compact />)}
           </div>
         </div>
       </section>
