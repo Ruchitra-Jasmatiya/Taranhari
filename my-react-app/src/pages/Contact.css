@@ -1,145 +1,228 @@
-/* Contact.css - mobile first */
+/* ==========================================================================
+   TARAN HARI - LUXURY CONTACT PAGE STYLING (Contact.css)
+   ========================================================================== */
 
-.contact__hero { padding-block: var(--s-7) var(--s-6); }
-.contact__hero .container { display: grid; gap: var(--s-3); max-width: 900px; }
-.contact__lead { font-size: 1.1rem; max-width: 52ch; }
+.contact {
+  background-color: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-head, serif);
+}
 
-/* ---------- Big tap buttons ---------- */
-.contact__actions { padding-block: var(--s-6); border-block: var(--line) solid var(--ink); }
-.contact__grid4 { display: grid; gap: var(--s-4); grid-template-columns: 1fr; }
+.contact__hero {
+  padding: 60px 0 40px;
+  background: linear-gradient(135deg, var(--cream) 0%, #F4ECE1 100%);
+  border-bottom: 1px solid rgba(107, 17, 21, 0.1);
+}
+
+.contact__hero h1 {
+  font-family: var(--font-head, serif);
+  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  font-weight: 800;
+  color: var(--ink);
+  margin-top: 8px;
+}
+
+.contact__lead {
+  font-size: 1.15rem;
+  color: var(--ink-muted);
+  max-width: 52ch;
+  margin: 12px auto 0;
+  font-family: var(--font-body, system-ui, sans-serif);
+  line-height: 1.6;
+}
+
+/* ---------- 5-Column Primary Contact Grid ---------- */
+.contact__actions {
+  padding: 50px 0;
+  background: var(--cream-card);
+}
+
+.contact__grid5 {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
 
 .cbtn {
   display: flex;
   align-items: center;
-  gap: var(--s-4);
-  min-height: 84px;
-  padding: var(--s-3) var(--s-4);
-  background: var(--white);
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--cream);
   color: var(--ink);
-  border: var(--line) solid var(--ink);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow);
-  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+  border: 1px solid rgba(107, 17, 21, 0.15);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.cbtn:hover { transform: translate(-3px, -3px); box-shadow: 8px 8px 0 var(--ink); }
-.cbtn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
+
+.cbtn:hover {
+  transform: translateY(-4px);
+  border-color: var(--gold);
+  box-shadow: var(--shadow-luxury);
+}
 
 .cbtn__icon {
   flex: none;
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 54px;
-  background: var(--brand);
-  color: var(--on-brand);
-  border: var(--line-thin) solid var(--ink);
+  width: 50px;
+  height: 50px;
+  background: var(--maroon);
+  color: var(--cream);
   border-radius: 50%;
+  transition: background 0.3s;
 }
-.cbtn__text { display: grid; min-width: 0; }
-.cbtn__text strong { font-family: var(--font-head); font-size: 1.4rem; line-height: 1.1; }
-.cbtn__text small { font-size: 0.9rem; overflow-wrap: anywhere; }
 
-/* ---------- Location / owner / hours ---------- */
-.contact__cols { display: grid; gap: var(--s-6); }
-.contact__loc { display: grid; gap: var(--s-4); align-content: start; }
-.contact__address { display: flex; gap: var(--s-2); align-items: flex-start; font-size: 1.05rem; }
-.contact__address svg { flex: none; color: var(--brand); margin-top: 2px; }
+.cbtn:hover .cbtn__icon {
+  background: var(--gold);
+  color: var(--ink);
+}
 
-.map { overflow: hidden; aspect-ratio: 4 / 3; background: var(--accent); }
-.map iframe { width: 100%; height: 100%; border: 0; }
-.map__ph {
-  height: 100%;
+.cbtn__text {
   display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 6px;
-  padding: var(--s-4);
-  text-align: center;
-  outline: 2px dashed var(--ink);
-  outline-offset: -10px;
+  gap: 2px;
 }
-.map__ph strong { font-family: var(--font-head); font-size: 1.4rem; }
-.map__ph span { font-size: 0.8rem; font-weight: 600; }
-.contact__loc .btn { justify-self: start; }
 
-.contact__side { display: grid; gap: var(--s-5); align-content: start; }
+.cbtn__text strong {
+  font-family: var(--font-head, serif);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--ink);
+}
 
-.owner {
+.cbtn__text small {
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+  font-family: var(--font-body, system-ui, sans-serif);
+}
+
+/* ---------- Owner Card & Brand Section ---------- */
+.contact__details {
+  padding: 80px 0;
+}
+
+.contact__cols {
+  display: grid;
+  gap: 30px;
+  grid-template-columns: 1fr;
+}
+
+.owner-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--s-4);
-  padding: var(--s-4);
+  text-align: center;
+  gap: 20px;
+  padding: 36px;
+  background: var(--cream-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(212, 175, 55, 0.3);
 }
+
 .owner__photo {
-  flex: none;
-  width: 96px;
-  height: 96px;
+  width: 120px;
+  height: 120px;
   overflow: hidden;
-  border: var(--line) solid var(--ink);
   border-radius: 50%;
+  border: 3px solid var(--gold);
+  box-shadow: var(--shadow-card);
 }
+
+.owner__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.owner__info {
+  display: grid;
+  gap: 6px;
+}
+
 .owner__label {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--brand);
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--maroon);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
-.owner h3 { margin-top: 2px; }
 
-.hours { padding: var(--s-4) var(--s-5); }
-.hours h3 { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3); }
-.hours__row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 2px var(--s-4);
-  padding-block: var(--s-3);
-  border-top: var(--line-thin) dashed var(--ink);
-}
-.hours dt { font-weight: 600; }
-.hours dd { margin: 0; }
-
-/* ---------- Form ---------- */
-.contact__formwrap { max-width: 720px; }
-.formcard { padding: var(--s-5); }
-.formcard form { display: grid; gap: var(--s-4); }
-
-.field { display: grid; gap: 6px; }
-.field label { font-weight: 600; }
-.field input,
-.field textarea {
-  width: 100%;
-  min-height: 52px;
-  padding: 0.75rem 1rem;
-  background: var(--paper);
+.owner__info h3 {
+  font-family: var(--font-head, serif);
+  font-size: 1.6rem;
+  font-weight: 800;
   color: var(--ink);
-  border: var(--line) solid var(--ink);
-  border-radius: var(--r-md);
-  font-size: 1rem; /* 16px stops iOS zooming on focus */
-  transition: box-shadow var(--t-fast) var(--ease);
 }
-.field textarea { resize: vertical; min-height: 130px; }
-.field input:focus,
-.field textarea:focus { outline: none; box-shadow: 4px 4px 0 var(--accent), 4px 4px 0 3px var(--ink); }
-.field.has-error input,
-.field.has-error textarea { border-color: var(--brand); }
-.field__err { color: var(--brand); font-weight: 600; font-size: 0.9rem; }
 
-.thanks { display: grid; gap: var(--s-3); justify-items: center; text-align: center; padding-block: var(--s-4); }
-.thanks > svg { color: var(--fresh); }
-.thanks__btns { display: flex; flex-wrap: wrap; gap: var(--s-3); justify-content: center; margin-top: var(--s-2); }
+.owner__info p {
+  font-size: 0.95rem;
+  color: var(--ink-muted);
+}
 
-/* ---------- Tablet / desktop ---------- */
-@media (min-width: 600px) {
-  .contact__grid4 { grid-template-columns: 1fr 1fr; }
+.owner__bio {
+  font-style: italic;
+  margin-top: 10px;
+  font-size: 1rem !important;
+  color: var(--maroon-dark) !important;
+  max-width: 40ch;
+}
+
+.brand-promise-card {
+  display: grid;
+  gap: 16px;
+  padding: 36px;
+  background: linear-gradient(135deg, var(--maroon-dark) 0%, var(--maroon) 100%);
+  color: var(--cream);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-luxury);
+  align-content: center;
+}
+
+.brand-promise-card .eyebrow {
+  color: var(--gold);
+}
+
+.brand-promise-card h2 {
+  font-family: var(--font-head, serif);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--cream);
+}
+
+.brand-promise-card p {
+  font-size: 1.1rem;
+  color: #F0DCDC;
+  line-height: 1.6;
+  font-family: var(--font-body, system-ui, sans-serif);
+}
+
+/* ---------- Responsive Breakpoints ---------- */
+@media (min-width: 640px) {
+  .contact__grid5 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .owner-card {
+    flex-direction: row;
+    text-align: left;
+    align-items: center;
+  }
+  .owner__label {
+    justify-content: flex-start;
+  }
 }
 
 @media (min-width: 1024px) {
-  .contact__hero { padding-block: var(--s-8) var(--s-7); }
-  .contact__grid4 { grid-template-columns: repeat(4, 1fr); }
-  .cbtn { flex-direction: column; align-items: flex-start; min-height: 160px; justify-content: space-between; }
-  .contact__cols { grid-template-columns: 1.3fr 1fr; gap: var(--s-7); }
-  .formcard { padding: var(--s-6); }
+  .contact__grid5 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .contact__cols {
+    grid-template-columns: 1.2fr 1fr;
+  }
 }

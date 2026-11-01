@@ -17,10 +17,10 @@ import './Shop.css';
 
 // ---------- Curated Google Unsplash URLs for Categories & Products ----------
 const CATEGORY_FEATURED = [
-  { name: 'Namkeen', note: 'Royal bhujia, mixes & dalmoth', img: 'https://images.unsplash.com/photo-1599487484170-7c9e6e4fe358?q=80&w=800&auto=format&fit=crop', tone: 'brand' },
-  { name: 'Khasta Puri', note: 'Flaky, golden & traditional', img: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop', tone: 'accent' },
-  { name: 'Corn Puff', note: 'Light, airy & chatpata', img: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop', tone: 'ink' },
-  { name: 'Sev', note: 'Ratlami, garlic & royal plain', img: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop', tone: 'white' },
+  { name: 'Namkeen', note: 'Royal bhujia, mixes & dalmoth', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStSfT6_rGHxemzsOCFv7HYqqb5zTAGmz-Y1iQYpmG4gA&s=10', tone: 'brand' },
+  { name: 'Khasta Puri', note: 'Flaky, golden & traditional', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5Z9XhJ7s2Jfh2Njv0UiT6CzE8T8vrL8em1CLChR4dHUVi5vBYuhBsNOA&s=10', tone: 'accent' },
+  { name: 'Corn Puff', note: 'Light, airy & chatpata', img: 'https://5.imimg.com/data5/ANDROID/Default/2023/4/297400496/FV/JD/VV/23983265/product-jpeg.jpg', tone: 'ink' },
+  { name: 'Sev', note: 'Ratlami, garlic & royal plain', img: 'https://cdn.tarladalal.com/media/recipe/mainphoto/2025/03/21/sev.webp', tone: 'white' },
 ];
 
 const FACTORY_VIDEO = '/videos/factory.mp4';
@@ -33,7 +33,7 @@ const QUOTES = [
 ];
 
 const CHAAT = [
-  { src: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop', caption: 'Pani puri chaat' },
+  { src: 'https://cdn.tarladalal.com/media/recipe/mainphoto/2025/03/21/sev.webp', caption: 'Pani puri chaat' },
   { src: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop', caption: 'Khasta kachori chaat' },
   { src: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop', caption: 'Sev puri' },
   { src: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800&auto=format&fit=crop', caption: 'Bhel' },
