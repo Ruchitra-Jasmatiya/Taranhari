@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, ChevronLeft, ChevronRight, Flame, Leaf, ShieldCheck, Sparkles, Star, Truck } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowRight, ChevronLeft, ChevronRight, Flame, Leaf, ShieldCheck, Sparkles, Truck, X } from 'lucide-react';
 import Reveal from '../components/Reveal.jsx';
 import Img from '../components/Img.jsx';
 import Stars from '../components/Stars.jsx';
 import './Home.css';
 
 /* ------------------------------------------------------------------
-   LOCAL ASSET IMPORTS & URL FALLBACKS (From your assets folder)
+   LOCAL ASSET IMPORTS & URL FALLBACKS
 ------------------------------------------------------------------ */
 import img1 from '../assets/images/img1.jpeg';
 import img2 from '../assets/images/img2.png';
@@ -19,15 +19,15 @@ import vid1 from '../assets/images/vid1.mp4';
 import vid2 from '../assets/images/vid2.mp4';
 import vid3 from '../assets/images/vid3.mp4';
 
-// Banner Carousel Images (Alternating local assets and high-end professional snack imagery)
+// Banner Carousel Images (Pure images, NO text overlays)
 const BANNER_IMAGES = [
-  { src: img1, title: 'Royal Heritage Namkeen', subtitle: 'Crafted with authentic spices & pure ghee tradition' },
-  { src: img2, title: 'Crispy & Crunchy Sev', subtitle: 'Fried fresh every morning with golden perfection' },
-  { src: img3, title: 'Special Party Mixes', subtitle: 'The ultimate companion for your evening chai' },
-  { src: 'https://images.unsplash.com/photo-1599487484170-7c9e6e4fe358?q=80&w=1600&auto=format&fit=crop', title: 'Traditional Delicacies', subtitle: 'Handcrafted purity in every single bite' },
+  { src: img1, alt: 'Royal Namkeen Showcase 1' },
+  { src: img2, alt: 'Royal Namkeen Showcase 2' },
+  { src: img3, alt: 'Royal Namkeen Showcase 3' },
+  { src: 'https://images.unsplash.com/photo-1599487484170-7c9e6e4fe358?q=80&w=1600&auto=format&fit=crop', alt: 'Royal Namkeen Showcase 4' },
 ];
 
-// Mini Image Blocks (Using your provided local assets + curated Google URLs)
+// Mini Image Blocks
 const MINI_BLOCKS = [
   { src: img1, title: 'Classic Assortment', tag: 'Bestseller' },
   { src: img2, title: 'Spicy Ratlami Sev', tag: 'Crispy' },
@@ -35,34 +35,18 @@ const MINI_BLOCKS = [
   { src: img4, title: 'Chatpata Corn Puffs', tag: 'Flavorful' },
   { src: img5, title: 'Festive Gift Box', tag: 'Special' },
   { src: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop', title: 'Royal Masala Mix', tag: 'Premium' },
-  { src: 'https://images.unsplash.com/photo-1599487484170-7c9e6e4fe358?q=80&w=800&auto=format&fit=crop', title: 'Freshly Baked Crunch', tag: 'Daily Fresh' },
-  { src: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?q=80&w=800&auto=format&fit=crop', title: 'Grand Celebration Pack', tag: 'Family Pack' },
 ];
 
-// Showcase Videos
+// Showcase Videos with Specific Titles
 const SHOWCASE_VIDEOS = [
-  { src: vid1, title: 'The Art of Frying', desc: 'Watch how golden perfection is achieved in small batches.' },
-  { src: vid2, title: 'Fresh Masala Tossing', desc: 'Coated while warm with our secret proprietary spice blend.' },
-  { src: vid3, title: 'Handmade Layering', desc: 'Traditional Akola techniques passed down through generations.' },
+  { src: vid1, title: 'Bhel Masterclass', desc: 'Crispy puffed rice and sev tossed in fresh tangy tamarind and spicy chutneys.' },
+  { src: vid2, title: 'Pani Puri Perfection', desc: 'Hollow, crispy puris filled with spiced potato and chilled aromatic mint water.' },
+  { src: vid3, title: 'Khasta Puri Craft', desc: 'Gold-fried flaky layers handcrafted for the ultimate tea-time crunch.' },
 ];
 
 const HERO_IMAGE = img1;
-const FLOATERS = [
-  { src: img2, alt: 'A piece of sev', className: 'f1' },
-  { src: img3, alt: 'A corn puff', className: 'f2' },
-  { src: img4, alt: 'A khasta puri', className: 'f3' },
-  { src: img5, alt: 'A peanut', className: 'f4' },
-];
 
 const MARQUEE = ['Namkeen', 'Khasta Puri', 'Corn Puff', 'Sev', 'Fresh Daily', 'Royal Taste', 'Pure Ingredients'];
-
-const STORY = [
-  { src: img1, alt: 'Hands kneading fresh dough', title: 'It starts with golden dough', text: 'Finest wheat flour, handpicked spices, and generations of patience kneaded fresh every sunrise.' },
-  { src: img2, alt: 'Rolling out puri by hand', title: 'Hand-rolled craftsmanship', text: 'No mechanical shortcuts. Every layer is meticulously rolled to ensure absolute khasta texture.' },
-  { src: img3, alt: 'Golden snacks frying in a kadhai', title: 'Slow-fried to perfection', text: 'Fried in crystal-clear oil at precise temperatures for that unforgettable lingering crunch.' },
-  { src: img4, alt: 'Masala being tossed over hot namkeen', title: 'Warm masala infusion', text: 'Proprietary house spices are dusted while the snacks are warm so every morsel absorbs the magic.' },
-  { src: img5, alt: 'Packets being sealed', title: 'Airtight freshness sealing', text: 'Packed instantly to lock in aroma and crunch, delivering straight from our kitchen to your teacup.' },
-];
 
 const TILES = [
   { name: 'Namkeen', note: 'Bhujia, royal mixes, dalmoth', img: img1, tone: 'brand' },
@@ -77,11 +61,12 @@ const ABOUT_TEXT = [
   'We roast, grind, and mix our spices in-house daily. Every single packet carries our family’s promise: exceptional taste that makes every tea break memorable.',
 ];
 
+// Updated Team List with exact names requested
 const TEAM = [
   { name: 'Gautam Jasmatia', role: 'Founder & Mentor', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop', text: 'Guiding our vision with decades of business wisdom and commitment to absolute quality.' },
-  { name: 'Director Name', role: 'Operations Director', photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=600&auto=format&fit=crop', text: 'Overseeing kitchen hygiene, supply chain excellence, and pristine daily production.' },
-  { name: 'Co-founder Name', role: 'Head of Product & Growth', photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop', text: 'Innovating new flavor profiles while keeping ancestral recipes intact.' },
-  { name: 'Ruchi Jasmatiya', role: 'Tech & Digital Lead', photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop', text: 'Driving digital experiences, brand aesthetics, and seamless customer interactions.' },
+  { name: 'Jigyasa Jasmatia', role: 'Director & Operations', photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop', text: 'Overseeing kitchen hygiene, supply chain excellence, and pristine daily production.' },
+  { name: 'Co-founder Name', role: 'Co-founder', photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop', text: 'Innovating new flavor profiles while keeping ancestral recipes intact.' },
+  { name: 'Ruchi Jasmatiya', role: 'Tech & Digital Lead', photo: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=600&auto=format&fit=crop', text: 'Driving digital experiences, brand aesthetics, and seamless customer interactions.' },
 ];
 
 const WHY = [
@@ -96,36 +81,7 @@ const REVIEWS = [
   { name: 'Priya Deshmukh', city: 'Nagpur', stars: 5, quote: 'Reminds me of homemade Diwali snacks. Extremely fresh and premium packaging.' },
   { name: 'Rajesh Agrawal', city: 'Akola', stars: 5, quote: 'The Ratlami sev is unmatched. Clean, authentic, and bursting with royal flavor.' },
   { name: 'Sneha Kulkarni', city: 'Mumbai', stars: 4.5, quote: 'Ordered for a family gathering and everyone asked for the website link. Fantastic quality!' },
-  { name: 'Vikram Mehta', city: 'Bengaluru', stars: 5, quote: 'Fast delivery and premium taste. Taran Hari has become our official snack partner.' },
 ];
-
-/* ------------------------------------------------------------------
-   Small helpers
------------------------------------------------------------------- */
-function useMedia(query) {
-  const [match, setMatch] = useState(() => (typeof window !== 'undefined' ? window.matchMedia(query).matches : false));
-  useEffect(() => {
-    const m = window.matchMedia(query);
-    const on = () => setMatch(m.matches);
-    on();
-    m.addEventListener('change', on);
-    return () => m.removeEventListener('change', on);
-  }, [query]);
-  return match;
-}
-
-function Floater({ src, alt, className }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <span className={`floater ${className}`} aria-hidden="true">
-      {failed ? (
-        <span className="floater__blob" />
-      ) : (
-        <img src={src} alt="" onError={() => setFailed(true)} loading="eager" />
-      )}
-    </span>
-  );
-}
 
 /* ------------------------------------------------------------------
    Page Component
@@ -137,17 +93,15 @@ export default function Home() {
       <BannerSlider />
       <Marquee />
       <MediaShowcase />
-      <Story />
       <Categories />
       <About />
       <Why />
       <Reviews />
-      <FinalCta />
     </div>
   );
 }
 
-/* ---------- 1. Hero ---------- */
+/* ---------- 1. Hero (Single Clean Circle) ---------- */
 function Hero() {
   return (
     <section className="hero">
@@ -164,25 +118,13 @@ function Hero() {
           </motion.p>
           <motion.div className="hero__btns" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, delay: 0.24 }}>
             <Link to="/shop" className="btn btn--primary">Explore Collection <ArrowRight size={20} strokeWidth={2.5} aria-hidden="true" /></Link>
-            <a href="#story" className="btn btn--outline">Our Heritage</a>
           </motion.div>
         </div>
 
         <motion.div className="hero__visual" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}>
-          <div className="hero__plate" />
-          <div className="hero__img">
+          {/* Single clean plate circle */}
+          <div className="hero__plate-single">
             <Img src={HERO_IMAGE} alt="A heaped bowl of premium namkeen" eager />
-          </div>
-          {FLOATERS.map((f) => <Floater key={f.className} {...f} />)}
-
-          <div className="hero__badge" aria-hidden="true">
-            <svg viewBox="0 0 120 120" className="hero__badgeRing">
-              <defs><path id="circ" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0" /></defs>
-              <text fontSize="12" fontWeight="800" fill="currentColor" letterSpacing="2.5">
-                <textPath href="#circ">100% PURE • ROYAL QUALITY • FRESH DAILY •</textPath>
-              </text>
-            </svg>
-            <span className="hero__badgeMid">👑</span>
           </div>
         </motion.div>
       </div>
@@ -190,7 +132,7 @@ function Hero() {
   );
 }
 
-/* ---------- 2. Dynamic Banner Slider (Changes every 3 seconds) ---------- */
+/* ---------- 2. Dynamic Banner Slider (Pure Images, Auto-transition 3s) ---------- */
 function BannerSlider() {
   const [current, setCurrent] = useState(0);
 
@@ -208,22 +150,13 @@ function BannerSlider() {
           <AnimatePresence mode="wait">
             <motion.div
               key={current}
-              className="banner__slide"
+              className="banner__slide-pure"
               initial={{ opacity: 0, scale: 1.02 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.6, ease: 'easeInOut' }}
             >
-              <div className="banner__slide-img-wrap">
-                <img src={BANNER_IMAGES[current].src} alt={BANNER_IMAGES[current].title} className="banner__slide-img" />
-                <div className="banner__slide-overlay" />
-              </div>
-              <div className="banner__slide-content">
-                <span className="banner__tag">Featured Spotlight</span>
-                <h2>{BANNER_IMAGES[current].title}</h2>
-                <p>{BANNER_IMAGES[current].subtitle}</p>
-                <Link to="/shop" className="btn btn--accent">Order Now <ArrowRight size={18} /></Link>
-              </div>
+              <img src={BANNER_IMAGES[current].src} alt={BANNER_IMAGES[current].alt} className="banner__pure-img" />
             </motion.div>
           </AnimatePresence>
 
@@ -270,18 +203,24 @@ function Marquee() {
   );
 }
 
-/* ---------- 4. Media & Mini Images Showcase Section ---------- */
+/* ---------- 4. Media Showcase & Video Lightbox Carousel ---------- */
 function MediaShowcase() {
+  const [activeVideo, setActiveVideo] = useState(null);
+  const [videoIdx, setVideoIdx] = useState(0);
+
+  const nextVideo = () => setVideoIdx((prev) => (prev + 1) % SHOWCASE_VIDEOS.length);
+  const prevVideo = () => setVideoIdx((prev) => (prev - 1 + SHOWCASE_VIDEOS.length) % SHOWCASE_VIDEOS.length);
+
   return (
     <section className="showcase-section">
       <div className="container">
         <div className="section-head text-center">
           <span className="eyebrow">Visual Feast</span>
           <h2>A Glimpse into Our Kitchen & Masterpieces</h2>
-          <p className="section-sub">Explore our signature creations and behind-the-scenes video highlights.</p>
+          <p className="section-sub">Explore our signature creations and craftsmanship video highlights.</p>
         </div>
 
-        {/* 5-6 Mini Image Blocks Grid */}
+        {/* Mini Image Blocks (5-6 items) */}
         <div className="mini-blocks-grid">
           {MINI_BLOCKS.map((item, idx) => (
             <motion.div
@@ -304,22 +243,32 @@ function MediaShowcase() {
           ))}
         </div>
 
-        {/* Big Amazing Video Showcase Section */}
+        {/* Videos Section (1 video on mobile, 2 on desktop with slide navigation & tap-to-zoom) */}
         <div className="videos-showcase-wrap">
-          <h3 className="videos-title">Kitchen Action & Craftsmanship</h3>
+          <div className="videos-header-flex">
+            <h3 className="videos-title">Kitchen Action & Craftsmanship</h3>
+            <div className="video-slider-controls">
+              <button onClick={prevVideo} aria-label="Previous Video"><ChevronLeft size={20} /></button>
+              <button onClick={nextVideo} aria-label="Next Video"><ChevronRight size={20} /></button>
+            </div>
+          </div>
+
           <div className="videos-grid">
+            {/* We display current video on mobile, and 2 on desktop */}
             {SHOWCASE_VIDEOS.map((vid, i) => (
               <motion.div
                 key={i}
-                className="video-box"
+                className={`video-box ${i === videoIdx ? 'mobile-active-vid' : 'desktop-vid-item'}`}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.15 }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                onClick={() => setActiveVideo(vid)}
               >
                 <div className="video-player-wrap">
                   <video src={vid.src} autoPlay loop muted playsInline className="master-video" />
                   <div className="video-gradient-overlay" />
+                  <span className="video-tap-hint">Tap to Zoom & Play</span>
                 </div>
                 <div className="video-info">
                   <h4>{vid.title}</h4>
@@ -330,109 +279,25 @@ function MediaShowcase() {
           </div>
         </div>
       </div>
-    </section>
-  );
-}
 
-/* ---------- 5. Story ---------- */
-function Story() {
-  const reduce = useReducedMotion();
-  const wide = useMedia('(min-width: 768px)');
-  const sticky = wide && !reduce;
-
-  return (
-    <section id="story" className="story-section">
-      <div className="container story__intro text-center">
-        <Reveal>
-          <span className="eyebrow">Our Legacy</span>
-          <h2>How Every Packet Gets Its Royal Crunch</h2>
-        </Reveal>
-      </div>
-      {sticky ? <StorySticky /> : <StoryStack />}
-    </section>
-  );
-}
-
-function StorySticky() {
-  const ref = useRef(null);
-  const [active, setActive] = useState(0);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] });
-  const N = STORY.length;
-
-  useMotionValueEvent(scrollYProgress, 'change', (p) => {
-    const i = Math.min(N - 1, Math.max(0, Math.round(p * (N - 1) + 0.0001)));
-    setActive((cur) => (cur === i ? cur : i));
-  });
-
-  return (
-    <div ref={ref} className="story__scroll" style={{ height: `${N * 90}vh` }}>
-      <div className="story__sticky">
-        <div className="container story__stage">
-          <div className="story__frame">
-            {STORY.map((s, i) => (
-              <StoryLayer key={s.src} item={s} index={i} count={N} progress={scrollYProgress} />
-            ))}
-          </div>
-
-          <div className="story__caption" aria-live="polite">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={active}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -16 }}
-                transition={{ duration: 0.3 }}
-              >
-                <span className="story__step">Step {active + 1} of {N}</span>
-                <h3>{STORY[active].title}</h3>
-                <p>{STORY[active].text}</p>
-              </motion.div>
-            </AnimatePresence>
-
-            <ol className="story__dots" aria-label="Story progress">
-              {STORY.map((s, i) => (
-                <li key={s.title} className={i === active ? 'is-on' : i < active ? 'is-done' : ''}><span className="sr-only">{s.title}</span></li>
-              ))}
-            </ol>
+      {/* Video Lightbox Modal */}
+      {activeVideo && (
+        <div className="video-lightbox-overlay" onClick={() => setActiveVideo(null)}>
+          <div className="video-lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <button className="lightbox-close" onClick={() => setActiveVideo(null)}><X size={24} /></button>
+            <video src={activeVideo.src} controls autoPlay className="lightbox-video-player" />
+            <div className="lightbox-details">
+              <h3>{activeVideo.title}</h3>
+              <p>{activeVideo.desc}</p>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </section>
   );
 }
 
-function StoryLayer({ item, index, count, progress }) {
-  const start = Math.max(0, (index - 0.7) / (count - 1));
-  const end = index / (count - 1);
-  const first = index === 0;
-  const opacity = useTransform(progress, first ? [0, 1] : [start, end], first ? [1, 1] : [0, 1]);
-  const y = useTransform(progress, first ? [0, 1] : [start, end], first ? [0, 0] : [90, 0]);
-  const scale = useTransform(progress, first ? [0, 1] : [start, end], first ? [1, 1] : [0.86, 1]);
-  return (
-    <motion.div className="story__layer" style={{ opacity, y, scale, zIndex: index }}>
-      <Img src={item.src} alt={item.alt} />
-    </motion.div>
-  );
-}
-
-function StoryStack() {
-  return (
-    <div className="container story__stack">
-      {STORY.map((s, i) => (
-        <Reveal key={s.src} className="scard" delay={0.05}>
-          <div className="scard__img"><Img src={s.src} alt={s.alt} /></div>
-          <div className="scard__body">
-            <span className="story__step">Step {i + 1} of {STORY.length}</span>
-            <h3>{s.title}</h3>
-            <p>{s.text}</p>
-          </div>
-        </Reveal>
-      ))}
-    </div>
-  );
-}
-
-/* ---------- 6. Categories ---------- */
+/* ---------- 5. Categories ---------- */
 function Categories() {
   return (
     <section className="section cats-section">
@@ -458,9 +323,10 @@ function Categories() {
   );
 }
 
-/* ---------- 7. About + Team ---------- */
+/* ---------- 6. About + Enhanced Team Section ---------- */
 function About() {
-  const [open, setOpen] = useState(null);
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+
   return (
     <section className="section about-section">
       <div className="container">
@@ -476,37 +342,33 @@ function About() {
         </div>
 
         <Reveal className="section-head text-center about__headTeam">
-          <span className="eyebrow">Leadership</span>
-          <h2>Meet the Team Behind the Crunch</h2>
+          <span className="eyebrow">Meet The Team</span>
+          <h2>The People Behind the Crunch</h2>
         </Reveal>
-        <ul className="team">
+
+        {/* Enhanced Team Section with Image & Name Below and Hover Highlight Animation */}
+        <ul className="team-grid-modern">
           {TEAM.map((m, i) => {
-            const flipped = open === i;
+            const isHighlighted = hoveredIdx === i;
             return (
               <Reveal as="li" key={m.name} delay={i * 0.08}>
-                <button
-                  type="button"
-                  className={`tcard ${flipped ? 'is-flipped' : ''}`}
-                  aria-pressed={flipped}
-                  aria-label={`${m.name}, ${m.role}. Tap to flip`}
-                  onClick={() => setOpen(flipped ? null : i)}
+                <div
+                  className={`team-card-modern ${isHighlighted ? 'is-highlighted' : ''}`}
+                  onMouseEnter={() => setHoveredIdx(i)}
+                  onMouseLeave={() => setHoveredIdx(null)}
+                  onClick={() => setHoveredIdx(hoveredIdx === i ? null : i)}
                 >
-                  <span className="tcard__inner">
-                    <span className="tcard__face tcard__front">
-                      <span className="tcard__photo">
-                        <Img src={m.photo} alt={`Photo of ${m.name}`} compact />
-                      </span>
-                      <span className="tcard__name">{m.name}</span>
-                      <span className="tcard__role">{m.role}</span>
-                      <span className="tcard__hint">Tap to read bio</span>
-                    </span>
-                    <span className="tcard__face tcard__back">
-                      <span className="tcard__name">{m.name}</span>
-                      <span className="tcard__role">{m.role}</span>
-                      <span className="tcard__text">{m.text}</span>
-                    </span>
-                  </span>
-                </button>
+                  <div className="team-card__img-wrap">
+                    <img src={m.photo} alt={m.name} className="team-card__img" />
+                    <div className="team-card__overlay">
+                      <p>{m.text}</p>
+                    </div>
+                  </div>
+                  <div className="team-card__info">
+                    <h3>{m.name}</h3>
+                    <span className="team-card__role">{m.role}</span>
+                  </div>
+                </div>
               </Reveal>
             );
           })}
@@ -516,7 +378,7 @@ function About() {
   );
 }
 
-/* ---------- 8. Why Taran Hari ---------- */
+/* ---------- 7. Why Taran Hari ---------- */
 function Why() {
   return (
     <section className="section why-section">
@@ -539,19 +401,17 @@ function Why() {
   );
 }
 
-/* ---------- 9. Reviews ---------- */
+/* ---------- 8. Reviews ---------- */
 function Reviews() {
   const trackRef = useRef(null);
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
-  const reduce = useReducedMotion();
-  const wide = useMedia('(min-width: 1024px)');
 
   const goTo = (i) => {
     const el = trackRef.current;
     if (!el) return;
     const card = el.children[i];
-    if (card) el.scrollTo({ left: card.offsetLeft - el.offsetLeft - 16, behavior: reduce ? 'auto' : 'smooth' });
+    if (card) el.scrollTo({ left: card.offsetLeft - el.offsetLeft - 16, behavior: 'smooth' });
   };
 
   const onScroll = () => {
@@ -563,10 +423,10 @@ function Reviews() {
   };
 
   useEffect(() => {
-    if (wide || paused || reduce) return undefined;
+    if (paused) return undefined;
     const t = setInterval(() => goTo((idx + 1) % REVIEWS.length), 4500);
     return () => clearInterval(t);
-  }, [idx, paused, wide, reduce]);
+  }, [idx, paused]);
 
   const initials = (n) => n.split(' ').map((s) => s[0]).join('').slice(0, 2).toUpperCase();
 
@@ -582,10 +442,6 @@ function Reviews() {
           className="reviews__wrap"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
-          onTouchStart={() => setPaused(true)}
-          onTouchEnd={() => setTimeout(() => setPaused(false), 6000)}
-          onFocus={() => setPaused(true)}
-          onBlur={() => setPaused(false)}
         >
           <ul className="reviews__track" ref={trackRef} onScroll={onScroll} tabIndex={0} aria-label="Customer reviews">
             {REVIEWS.map((r) => (
@@ -605,23 +461,6 @@ function Reviews() {
             ))}
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------- 10. Final CTA ---------- */
-function FinalCta() {
-  return (
-    <section className="cta-section">
-      <div className="container cta__inner text-center">
-        <Reveal>
-          <h2>Hungry for Royal Crunch?</h2>
-          <p>Treat your tea time to authentic flavors. Your next packet is just a tap away.</p>
-        </Reveal>
-        <Reveal delay={0.12}>
-          <Link to="/shop" className="btn btn--accent btn--lg">Shop Collection Now <ArrowRight size={22} strokeWidth={2.5} aria-hidden="true" /></Link>
-        </Reveal>
       </div>
     </section>
   );
