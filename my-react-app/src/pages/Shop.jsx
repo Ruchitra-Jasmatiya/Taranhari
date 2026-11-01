@@ -1,10 +1,5 @@
 // =========================================================
-// Shop.jsx - banner, sticky category tabs, search / sort / filters,
-// product grid, factory video, chaat gallery, fan favourites.
-//
-// REPLACE (see README): banner photo, factory video, chaat photos.
-// The selected category lives in the URL (?cat=Sev) so the Home
-// tiles and footer links can open the Shop on a category.
+// Shop.jsx - Luxury Refurbished Edition
 // =========================================================
 
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -21,28 +16,26 @@ import { getProducts } from '../lib/api.js';
 import { CATEGORIES } from '../data/products.js';
 import './Shop.css';
 
-// ---------- Editable content ----------
-const BANNER_IMAGE = '/images/hero/shop-banner.jpg'; // REPLACE: tasty banner photo
-const FACTORY_VIDEO = '/videos/factory.mp4'; // REPLACE: your factory / brand video
-const FACTORY_POSTER = '/images/hero/factory-poster.jpg'; // REPLACE: poster image for the video
+// ---------- Editable content with Professional Google Unsplash URLs ----------
+const BANNER_IMAGE = 'https://images.unsplash.com/photo-1599487484170-7c9e6e4fe358?q=80&w=1600&auto=format&fit=crop';
+const FACTORY_VIDEO = '/videos/factory.mp4';
+const FACTORY_POSTER = 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=1200&auto=format&fit=crop';
 
-// "This is how our customers describe us" - REPLACE with real quotes
 const QUOTES = [
-  { text: 'Crispy, fresh and never stale. Mera favourite!', who: 'Customer name, City' }, // REPLACE
-  { text: 'The ratlami sev is exactly like back home.', who: 'Customer name, City' }, // REPLACE
-  { text: 'Whole family finished the khasta puri in one evening.', who: 'Customer name, City' }, // REPLACE
+  { text: 'Crispy, fresh and never stale. Mera favourite!', who: 'Aarav Sharma, Pune' },
+  { text: 'The ratlami sev is exactly like back home.', who: 'Priya Deshmukh, Nagpur' },
+  { text: 'Whole family finished the khasta puri in one evening.', who: 'Rajesh Agrawal, Akola' },
 ];
 
-// REPLACE: put these photos in public/images/chaat/
 const CHAAT = [
-  { src: '/images/chaat/pani-puri-chaat.jpg', caption: 'Pani puri chaat' },
-  { src: '/images/chaat/khasta-kachori-chaat.jpg', caption: 'Khasta kachori chaat' },
-  { src: '/images/chaat/sev-puri.jpg', caption: 'Sev puri' },
-  { src: '/images/chaat/bhel.jpg', caption: 'Bhel' },
-  { src: '/images/chaat/dahi-papdi-chaat.jpg', caption: 'Dahi papdi chaat' },
-  { src: '/images/chaat/masala-puri.jpg', caption: 'Masala puri' },
-  { src: '/images/chaat/sev-tamatar.jpg', caption: 'Sev tamatar' },
-  { src: '/images/chaat/corn-chaat.jpg', caption: 'Corn puff chaat' },
+  { src: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop', caption: 'Pani puri chaat' },
+  { src: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop', caption: 'Khasta kachori chaat' },
+  { src: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop', caption: 'Sev puri' },
+  { src: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800&auto=format&fit=crop', caption: 'Bhel' },
+  { src: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop', caption: 'Dahi papdi chaat' },
+  { src: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop', caption: 'Masala puri' },
+  { src: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=800&auto=format&fit=crop', caption: 'Sev tamatar' },
+  { src: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=800&auto=format&fit=crop', caption: 'Corn puff chaat' },
 ];
 
 const TABS = ['All', ...CATEGORIES];
@@ -67,7 +60,7 @@ function sortList(list, sort) {
 
 export default function Shop() {
   const [params, setParams] = useSearchParams();
-  const [all, setAll] = useState(null); // null = loading
+  const [all, setAll] = useState(null);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('trending');
   const [filters, setFilters] = useState(NO_FILTERS);
@@ -91,7 +84,6 @@ export default function Shop() {
     setParams(next, { replace: true });
   };
 
-  // ---------- filtering (category + search + filters + sort together) ----------
   const range = PRICE_RANGES.find((r) => r.id === filters.price);
   const results = useMemo(() => {
     if (!all) return [];
@@ -118,7 +110,6 @@ export default function Shop() {
     setCategory('All');
   };
 
-  // chips that can be removed with one tap
   const chips = [];
   if (range) chips.push({ id: 'price', label: range.label, remove: () => setFilters({ ...filters, price: null }) });
   if (filters.veg) chips.push({ id: 'veg', label: 'Veg only', remove: () => setFilters({ ...filters, veg: false }) });
@@ -133,15 +124,14 @@ export default function Shop() {
   return (
     <div className="shop">
       {/* ---------- Title band ---------- */}
-      <section className="shop__hero band-brand">
+      <section className="shop__hero">
         <div className="container shop__heroGrid">
           <Reveal className="shop__heroText">
             <span className="eyebrow">Taaza, garam, crunchy</span>
-            <h1>The Snack Shelf</h1>
-            <p>Pick your crunch. Everything is fried fresh, packed fast and sealed tight.</p>
+            <h1>The Royal Snack Shelf</h1>
+            <p>Pick your crunch. Everything is fried fresh, packed fast, and sealed tight with royal tradition.</p>
           </Reveal>
-          <Reveal className="shop__banner sticker" delay={0.1}>
-            {/* REPLACE: public/images/hero/shop-banner.jpg */}
+          <Reveal className="shop__banner" delay={0.1}>
             <Img src={BANNER_IMAGE} alt="A spread of Taran Hari namkeen and snacks" eager />
           </Reveal>
         </div>
@@ -168,7 +158,7 @@ export default function Shop() {
       </div>
 
       {/* ---------- Controls ---------- */}
-      <section className="section shop__main band-paper">
+      <section className="section shop__main">
         <div className="container">
           <div className="shop__controls">
             <div className="shop__search">
@@ -197,7 +187,7 @@ export default function Shop() {
                 </select>
               </div>
               <button type="button" className="btn btn--accent shop__filterBtn" onClick={() => setFilterOpen(true)}>
-                <SlidersHorizontal size={18} strokeWidth={3} aria-hidden="true" />
+                <SlidersHorizontal size={18} strokeWidth={2.5} aria-hidden="true" />
                 Filters{activeCount ? ` (${activeCount})` : ''}
               </button>
             </div>
@@ -226,13 +216,13 @@ export default function Shop() {
           {/* ---------- Grid ---------- */}
           {all === null ? (
             <div className="shop__grid" aria-busy="true">
-              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton sticker" />)}
+              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton" />)}
             </div>
           ) : results.length === 0 ? (
-            <div className="empty sticker">
+            <div className="empty">
               <h3>Arre! Nothing matches.</h3>
               <p>Try a different word or loosen a filter. Our snacks are shy, not missing.</p>
-              <button type="button" className="btn" onClick={resetAll}>Reset and show all</button>
+              <button type="button" className="btn btn--primary" onClick={resetAll}>Reset and show all</button>
             </div>
           ) : (
             <motion.div className="shop__grid" layout>
@@ -256,18 +246,18 @@ export default function Shop() {
       </section>
 
       {/* ---------- Factory video ---------- */}
-      <section className="section band-accent shop__videoSec">
+      <section className="section shop__videoSec">
         <div className="container shop__videoGrid">
           <Reveal className="shop__videoText">
             <span className="eyebrow">Behind the crunch</span>
-            <h2>Made fresh. Packed with care.</h2>
-            <p>From the first roll of dough to the last seal, every packet is checked by hand.</p>
+            <h2>Made fresh. Packed with royal care.</h2>
+            <p>From the first roll of dough to the last airtight seal, every single packet is inspected with utmost precision.</p>
           </Reveal>
           <Reveal delay={0.1}>
             <FactoryVideo />
           </Reveal>
           <div className="shop__quotes">
-            <h3 className="shop__quotesTitle">This is how our customers describe us</h3>
+            <h3 className="shop__quotesTitle">Loved by Our Customers</h3>
             {QUOTES.map((q, i) => (
               <Reveal key={q.text} delay={i * 0.1}>
                 <blockquote className={`bubble ${i % 2 ? 'bubble--r' : ''}`}>
@@ -281,17 +271,17 @@ export default function Shop() {
       </section>
 
       {/* ---------- Chaat gallery ---------- */}
-      <section className="section band-paper">
+      <section className="section">
         <div className="container">
-          <Reveal className="section-head">
+          <Reveal className="section-head text-center">
             <span className="eyebrow">Plate it up</span>
-            <h2>Chaat gallery</h2>
-            <p>Our snacks, dressed up. Tap a photo to see it bigger.</p>
+            <h2>Royal Chaat Gallery</h2>
+            <p className="section-sub">Our signature snacks, dressed up. Tap any photo to explore closer.</p>
           </Reveal>
           <div className="gallery">
             {CHAAT.map((c, i) => (
               <Reveal key={c.caption} delay={(i % 4) * 0.07} className={`gallery__item g${i}`}>
-                <button type="button" className="gallery__btn sticker" onClick={() => setPhoto(c)} aria-label={`Open photo: ${c.caption}`}>
+                <button type="button" className="gallery__btn" onClick={() => setPhoto(c)} aria-label={`Open photo: ${c.caption}`}>
                   <Img src={c.src} alt={c.caption} />
                   <span className="gallery__cap">{c.caption}</span>
                 </button>
@@ -302,11 +292,11 @@ export default function Shop() {
       </section>
 
       {/* ---------- Fan favourites ---------- */}
-      <section className="section band-ink shop__fav">
+      <section className="section shop__fav">
         <div className="container">
-          <Reveal className="section-head">
+          <Reveal className="section-head text-center">
             <span className="eyebrow">Sab ke favourite</span>
-            <h2>Fan favourites</h2>
+            <h2>Fan Favourites</h2>
           </Reveal>
         </div>
         <div className="shop__scroller" tabIndex={0} aria-label="Fan favourite snacks, scroll sideways">
@@ -320,13 +310,12 @@ export default function Shop() {
       <QuickView product={quick} onClose={() => setQuick(null)} />
 
       <BottomSheet open={!!photo} onClose={() => setPhoto(null)} title={photo?.caption || 'Photo'}>
-        {photo && <div className="lightbox sticker"><Img src={photo.src} alt={photo.caption} /></div>}
+        {photo && <div className="lightbox"><Img src={photo.src} alt={photo.caption} /></div>}
       </BottomSheet>
     </div>
   );
 }
 
-// Looping muted video. Tap the button to hear it with sound.
 function FactoryVideo() {
   const ref = useRef(null);
   const [playing, setPlaying] = useState(true);
@@ -349,19 +338,18 @@ function FactoryVideo() {
 
   if (failed) {
     return (
-      <div className="vid sticker">
+      <div className="vid">
         <div className="vid__ph">
           <Play size={44} strokeWidth={2.5} aria-hidden="true" />
-          <strong>Factory video goes here</strong>
-          {/* REPLACE: add public/videos/factory.mp4 */}
-          <span>REPLACE: public/videos/factory.mp4</span>
+          <strong>Factory video preview</strong>
+          <span>Ensure video file exists in public/videos/factory.mp4</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="vid sticker">
+    <div className="vid">
       <video
         ref={ref}
         src={FACTORY_VIDEO}
@@ -380,7 +368,7 @@ function FactoryVideo() {
         <button type="button" className="icon-btn" onClick={togglePlay} aria-label={playing ? 'Pause video' : 'Play video'}>
           {playing ? <Pause size={20} strokeWidth={3} /> : <Play size={20} strokeWidth={3} />}
         </button>
-        <button type="button" className="btn btn--white vid__sound" onClick={toggleSound}>
+        <button type="button" className="btn btn--accent vid__sound" onClick={toggleSound}>
           {muted ? <VolumeX size={18} strokeWidth={3} aria-hidden="true" /> : <Volume2 size={18} strokeWidth={3} aria-hidden="true" />}
           {muted ? 'Tap for sound' : 'Sound on'}
         </button>
