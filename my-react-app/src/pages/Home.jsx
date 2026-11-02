@@ -40,9 +40,9 @@ const MINI_BLOCKS_DEFAULT = [
 
 // Showcase Videos with Specific Titles
 const SHOWCASE_VIDEOS_DEFAULT = [
-  { src: vid1, title: 'Bhel Masterclass', desc: 'Crispy puffed rice and sev tossed in fresh tangy tamarind and spicy chutneys.' },
-  { src: vid2, title: 'Pani Puri Perfection', desc: 'Hollow, crispy puris filled with spiced potato and chilled aromatic mint water.' },
-  { src: vid3, title: 'Khasta Puri Craft', desc: 'Gold-fried flaky layers handcrafted for the ultimate tea-time crunch.' },
+  { src: vid1, title: 'Bhel Masterclass' },
+  { src: vid2, title: 'Pani Puri Perfection' },
+  { src: vid3, title: 'Khasta Puri Craft' },
 ];
 
 const HERO_IMAGE_DEFAULT = img1;
