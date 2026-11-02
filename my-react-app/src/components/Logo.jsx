@@ -6,7 +6,7 @@ import './Logo.css';
 export function LogoMark({ size = 'md' }) {
   return (
     <span className={`logo logo--${size}`}>
-      <span className="logo__badge">Taran Hari</span>
+      <span className="logo__badge">Taranhari</span>
       <span className="logo__tag">Snacks &bull; Happiness &bull; Always</span>
     </span>
   );
