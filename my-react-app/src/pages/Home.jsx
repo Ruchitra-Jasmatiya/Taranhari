@@ -5,6 +5,7 @@ import { ArrowRight, ChevronLeft, ChevronRight, Flame, Leaf, ShieldCheck, Sparkl
 import Reveal from '../components/Reveal.jsx';
 import Img from '../components/Img.jsx';
 import Stars from '../components/Stars.jsx';
+import { useSite } from '../context/SiteContext.jsx';
 import './Home.css';
 
 /* ------------------------------------------------------------------
@@ -20,7 +21,7 @@ import vid2 from '../assets/images/vid2.mp4';
 import vid3 from '../assets/images/vid3.mp4';
 
 // Banner Carousel Images (Pure images, NO text overlays)
-const BANNER_IMAGES = [
+const BANNER_IMAGES_DEFAULT = [
   { src: img1, alt: 'Royal Namkeen Showcase 1' },
   { src: img2, alt: 'Royal Namkeen Showcase 2' },
   { src: img3, alt: 'Royal Namkeen Showcase 3' },
@@ -28,7 +29,7 @@ const BANNER_IMAGES = [
 ];
 
 // Mini Image Blocks
-const MINI_BLOCKS = [
+const MINI_BLOCKS_DEFAULT = [
   { src: img1, title: 'Classic Assortment', tag: 'Bestseller' },
   { src: img2, title: 'Spicy Ratlami Sev', tag: 'Crispy' },
   { src: img3, title: 'Golden Khasta Puri', tag: 'Handmade' },
@@ -38,31 +39,31 @@ const MINI_BLOCKS = [
 ];
 
 // Showcase Videos with Specific Titles
-const SHOWCASE_VIDEOS = [
+const SHOWCASE_VIDEOS_DEFAULT = [
   { src: vid1, title: 'Bhel Masterclass', desc: 'Crispy puffed rice and sev tossed in fresh tangy tamarind and spicy chutneys.' },
   { src: vid2, title: 'Pani Puri Perfection', desc: 'Hollow, crispy puris filled with spiced potato and chilled aromatic mint water.' },
   { src: vid3, title: 'Khasta Puri Craft', desc: 'Gold-fried flaky layers handcrafted for the ultimate tea-time crunch.' },
 ];
 
-const HERO_IMAGE = img1;
+const HERO_IMAGE_DEFAULT = img1;
 
-const MARQUEE = ['Namkeen', 'Khasta Puri', 'Corn Puff', 'Sev', 'Fresh Daily', 'Royal Taste', 'Pure Ingredients'];
+const MARQUEE_DEFAULT = ['Namkeen', 'Khasta Puri', 'Corn Puff', 'Sev', 'Fresh Daily', 'Royal Taste', 'Pure Ingredients'];
 
-const TILES = [
+const TILES_DEFAULT = [
   { name: 'Namkeen', note: 'Bhujia, royal mixes, dalmoth', img: img1, tone: 'brand' },
   { name: 'Khasta Puri', note: 'Flaky, golden & traditional', img: img2, tone: 'accent' },
   { name: 'Corn Puff', note: 'Light, airy & chatpata', img: img3, tone: 'ink' },
   { name: 'Sev', note: 'Ratlami, garlic & royal plain', img: img4, tone: 'white' },
 ];
 
-const ABOUT_PHOTO = img5;
-const ABOUT_TEXT = [
+const ABOUT_PHOTO_DEFAULT = img5;
+const ABOUT_TEXT_DEFAULT = [
   'Born from a deep passion for authentic Indian snacking traditions, our kitchen stands for uncompromised quality, pristine hygiene, and royal flavors.',
   'We roast, grind, and mix our spices in-house daily. Every single packet carries our family’s promise: exceptional taste that makes every tea break memorable.',
 ];
 
 // Updated Team List with exact names requested
-const TEAM = [
+const TEAM_DEFAULT = [
   { name: 'Gautam Jasmatia', role: 'Founder & Mentor', photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop', text: 'Guiding our vision with decades of business wisdom and commitment to absolute quality.' },
   { name: 'Jigyasa Jasmatia', role: 'Director & Operations', photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop', text: 'Overseeing kitchen hygiene, supply chain excellence, and pristine daily production.' },
   { name: 'Co-founder Name', role: 'Co-founder', photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=600&auto=format&fit=crop', text: 'Innovating new flavor profiles while keeping ancestral recipes intact.' },
@@ -76,7 +77,7 @@ const WHY = [
   { icon: Truck, title: 'Lightning Fast Delivery', text: 'Airtight packaging ensures your snacks arrive crisp, fresh, and ready to relish.' },
 ];
 
-const REVIEWS = [
+const REVIEWS_DEFAULT = [
   { name: 'Aarav Sharma', city: 'Pune', stars: 5, quote: 'Absolute game changer for evening tea! The crunch and spice levels are out of this world.' },
   { name: 'Priya Deshmukh', city: 'Nagpur', stars: 5, quote: 'Reminds me of homemade Diwali snacks. Extremely fresh and premium packaging.' },
   { name: 'Rajesh Agrawal', city: 'Akola', stars: 5, quote: 'The Ratlami sev is unmatched. Clean, authentic, and bursting with royal flavor.' },
@@ -103,6 +104,8 @@ export default function Home() {
 
 /* ---------- 1. Hero (Single Clean Circle) ---------- */
 function Hero() {
+  const { home, categories, live } = useSite();
+  const HERO_IMAGE = home.heroImage || HERO_IMAGE_DEFAULT;
   return (
     <section className="hero">
       <div className="container hero__grid">
@@ -134,6 +137,8 @@ function Hero() {
 
 /* ---------- 2. Dynamic Banner Slider (Pure Images, Auto-transition 3s) ---------- */
 function BannerSlider() {
+  const { home, categories, live } = useSite();
+  const BANNER_IMAGES = home.banners?.length ? home.banners : BANNER_IMAGES_DEFAULT;
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -186,6 +191,8 @@ function BannerSlider() {
 
 /* ---------- 3. Marquee ---------- */
 function Marquee() {
+  const { home, categories, live } = useSite();
+  const MARQUEE = home.marquee?.length ? home.marquee : MARQUEE_DEFAULT;
   const row = (hidden) => (
     <ul className="marquee__row" aria-hidden={hidden || undefined}>
       {[...MARQUEE, ...MARQUEE].map((w, i) => (
@@ -205,6 +212,9 @@ function Marquee() {
 
 /* ---------- 4. Media Showcase & Video Lightbox Carousel ---------- */
 function MediaShowcase() {
+  const { home, categories, live } = useSite();
+  const MINI_BLOCKS = home.blocks?.length ? home.blocks : MINI_BLOCKS_DEFAULT;
+  const SHOWCASE_VIDEOS = home.videos?.length ? home.videos : SHOWCASE_VIDEOS_DEFAULT;
   const [activeVideo, setActiveVideo] = useState(null);
   const [videoIdx, setVideoIdx] = useState(0);
 
@@ -299,6 +309,8 @@ function MediaShowcase() {
 
 /* ---------- 5. Categories ---------- */
 function Categories() {
+  const { home, categories, live } = useSite();
+  const TILES = live && categories.length ? categories.map((c) => ({ name: c.name, note: c.note || '', img: c.image, tone: c.tone || 'brand' })) : TILES_DEFAULT;
   return (
     <section className="section cats-section">
       <div className="container">
@@ -325,6 +337,10 @@ function Categories() {
 
 /* ---------- 6. About + Enhanced Team Section ---------- */
 function About() {
+  const { home, categories, live } = useSite();
+  const ABOUT_PHOTO = home.aboutPhoto || ABOUT_PHOTO_DEFAULT;
+  const ABOUT_TEXT = home.aboutText?.length ? home.aboutText : ABOUT_TEXT_DEFAULT;
+  const TEAM = home.team?.length ? home.team : TEAM_DEFAULT;
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
   return (
@@ -403,6 +419,8 @@ function Why() {
 
 /* ---------- 8. Reviews ---------- */
 function Reviews() {
+  const { home, categories, live } = useSite();
+  const REVIEWS = home.reviews?.length ? home.reviews : REVIEWS_DEFAULT;
   const trackRef = useRef(null);
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);

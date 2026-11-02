@@ -4,25 +4,14 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Facebook, Instagram, Mail, MessageCircle, Phone, ShieldCheck, Sparkles, User } from 'lucide-react';
+import { Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, ShieldCheck, Sparkles, User } from 'lucide-react';
 import Reveal from '../components/Reveal.jsx';
 import Img from '../components/Img.jsx';
+import { useSite } from '../context/SiteContext.jsx';
 import './Contact.css';
 
-export const CONTACT = {
-  ownerName: 'Kamlesh Verma',
-  ownerRole: 'Founder & Owner, Taran Hari',
-  ownerPhoto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=600&auto=format&fit=crop',
-  phoneDisplay: '+91 98765 43210',
-  phoneTel: '+919876543210',
-  whatsapp: '919876543210',
-  whatsappMessage: 'Namaste Taran Hari! I would like to enquire about your snacks.',
-  email: 'contact@taranhari.com',
-  instagram: 'https://www.instagram.com/',
-  facebook: 'https://www.facebook.com/',
-};
-
 export default function Contact() {
+  const { contact: CONTACT } = useSite();
   const waLink = `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(CONTACT.whatsappMessage)}`;
 
   return (
@@ -109,10 +98,19 @@ export default function Contact() {
               <h3>{CONTACT.ownerName}</h3>
               <p>{CONTACT.ownerRole}</p>
               <p className="owner__bio">
-                "Our promise is simple: pure ingredients, uncompromised kitchen hygiene, and authentic recipes that make every teatime special."
+                &ldquo;{CONTACT.ownerBio}&rdquo;
               </p>
             </div>
           </Reveal>
+
+          {(CONTACT.addressFull || CONTACT.hours) && (
+            <Reveal className="brand-promise-card" delay={0.1}>
+              <span className="eyebrow"><MapPin size={18} /> Visit Us</span>
+              {CONTACT.addressFull && <p style={{ whiteSpace: 'pre-line' }}>{CONTACT.addressFull}</p>}
+              {CONTACT.hours && <p><strong>Hours:</strong> {CONTACT.hours}</p>}
+              {CONTACT.mapUrl && <a className="btn" href={CONTACT.mapUrl} target="_blank" rel="noopener noreferrer">Open in Google Maps</a>}
+            </Reveal>
+          )}
 
           <Reveal className="brand-promise-card" delay={0.15}>
             <span className="eyebrow"><ShieldCheck size={18} /> Taran Hari Quality</span>

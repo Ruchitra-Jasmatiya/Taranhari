@@ -184,3 +184,7 @@
   .wcard { grid-template-columns: 1fr; }
   .wcard__img { aspect-ratio: 4 / 3; border-right: 0; border-bottom: var(--line) solid var(--ink); }
 }
+
+/* checkout form */
+.cofm label { display: grid; gap: 4px; font-weight: 800; font-size: 0.9rem; }
+.cofm input, .cofm textarea { font: inherit; font-weight: 600; padding: 10px 12px; border: var(--line, 3px) solid var(--ink); border-radius: 12px; background: #fff; color: var(--ink); width: 100%; box-sizing: border-box; }

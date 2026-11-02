@@ -7,19 +7,16 @@
 //   const { addToCart, cartCount, wishlist, toggleWishlist } = useCart();
 // =========================================================
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { getSizes } from '../data/products.js';
 import { useToast } from '../components/Toast.jsx';
+import { useSite } from './SiteContext.jsx';
+import { quoteCart, placeOrder as sendOrder } from '../lib/api.js';
 import { flyToCart, confettiBurst } from '../lib/effects.js';
 
-// ---------- Business rules (edit freely) ----------
-export const FREE_DELIVERY_AT = 499; // ₹ - delivery is free above this
-export const DELIVERY_FEE = 49; // ₹ - charged below the limit
-export const COUPONS = {
-  // code: { percent off }
-  TARAN10: { percent: 10, label: '10% off your order' },
-  CRUNCH15: { percent: 15, label: '15% off your order' },
-};
+// Prices, offers, coupons and delivery are decided by the backend
+// (see /api/cart/quote). The numbers below only show while the
+// backend cannot be reached.
 
 const STORAGE_KEY = 'taranhari-store-v1';
 const CONFETTI_KEY = 'taranhari-confetti-done';
@@ -85,7 +82,7 @@ function init() {
     return {
       items: Array.isArray(saved.items) ? saved.items : [],
       wishlist: Array.isArray(saved.wishlist) ? saved.wishlist : [],
-      coupon: saved.coupon && COUPONS[saved.coupon] ? saved.coupon : null,
+      coupon: typeof saved.coupon === 'string' && saved.coupon ? saved.coupon : null,
     };
   } catch {
     return emptyState;
@@ -121,7 +118,11 @@ export function CartProvider({ children }) {
   const addToCart = useCallback(
     (product, opts = {}) => {
       const sizes = getSizes(product);
-      const chosen = sizes.find((s) => s.label === opts.size) || sizes.find((s) => s.label === product.weight);
+      const chosen = sizes.find((s) => s.label === opts.size) || sizes.find((s) => s.label === product.weight && s.inStock) || sizes.find((s) => s.inStock);
+      if (!chosen || chosen.inStock === false) {
+        toast.show(`${product.name} is out of stock right now`, { type: 'error' });
+        return;
+      }
       const line = {
         key: makeKey(product.id, chosen.label),
         id: product.id,
@@ -181,20 +182,28 @@ export function CartProvider({ children }) {
 
   const clearCart = useCallback(() => dispatch({ type: 'CLEAR' }), []);
 
-  // Returns { ok: boolean, message: string }
+  // Validate a coupon with the backend. Returns Promise<{ ok, message }>
   const applyCoupon = useCallback(
-    (raw) => {
+    async (raw) => {
       const code = (raw || '').trim().toUpperCase();
       if (!code) return { ok: false, message: 'Type a coupon code first.' };
-      if (!COUPONS[code]) {
-        toast.show('That coupon code is not valid', { type: 'error' });
-        return { ok: false, message: 'Hmm, that code does not work. Check the spelling?' };
+      try {
+        const q = await quoteCart(
+          state.items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
+          code
+        );
+        if (q.coupon) {
+          dispatch({ type: 'SET_COUPON', code: q.coupon.code });
+          toast.show(`Coupon ${q.coupon.code} applied`, { type: 'success' });
+          return { ok: true, message: q.coupon.label || `${q.coupon.code} applied` };
+        }
+        toast.show('That coupon cannot be used', { type: 'error' });
+        return { ok: false, message: q.couponError || 'Hmm, that code does not work. Check the spelling?' };
+      } catch (e) {
+        return { ok: false, message: e.message || 'Could not check the coupon. Please try again.' };
       }
-      dispatch({ type: 'SET_COUPON', code });
-      toast.show(`Coupon ${code} applied`, { type: 'success' });
-      return { ok: true, message: `${code} applied: ${COUPONS[code].label}` };
     },
-    [toast]
+    [state.items, toast]
   );
 
   const removeCoupon = useCallback(() => dispatch({ type: 'SET_COUPON', code: null }), []);
@@ -204,24 +213,108 @@ export function CartProvider({ children }) {
     [state.items]
   );
 
-  // ----- Derived numbers -----
+  // ----- Live price check with the backend -----
+  const { settings, products: siteProducts, live } = useSite();
+  const [quote, setQuote] = useState(null);
+  const [quoting, setQuoting] = useState(false);
+  const sig = state.items.map((i) => `${i.key}x${i.qty}`).join(',') + `|${state.coupon || ''}`;
+  const stockSig = useRef('');
+  stockSig.current = siteProducts.map((p) => `${p.id}${p.price}${p.inStock}`).join('').length + ':' + siteProducts.length;
+
+  useEffect(() => {
+    if (state.items.length === 0) {
+      setQuote(null);
+      return undefined;
+    }
+    if (!live) {
+      setQuote(null);
+      return undefined;
+    }
+    let cancelled = false;
+    setQuoting(true);
+    const t = setTimeout(async () => {
+      try {
+        const q = await quoteCart(
+          state.items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
+          state.coupon
+        );
+        if (cancelled) return;
+        setQuote(q);
+        // A coupon that stopped being valid (expired, min order not met...) is dropped
+        if (state.coupon && !q.coupon) {
+          dispatch({ type: 'SET_COUPON', code: null });
+          if (q.couponError) toast.show(q.couponError, { type: 'info' });
+        }
+        // Never keep more in the cart than is in stock
+        q.lines.forEach((l) => {
+          const mine = state.items.find((i) => i.key === l.key);
+          if (mine && l.available && l.qty < mine.qty) dispatch({ type: 'SET_QTY', key: l.key, qty: l.qty });
+        });
+      } catch {
+        if (!cancelled) setQuote(null);
+      } finally {
+        if (!cancelled) setQuoting(false);
+      }
+    }, 220);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sig, live, stockSig.current]);
+
+  // Lines as shown in the cart: backend price/availability when we have it
+  const viewItems = useMemo(() => {
+    const byKey = new Map((quote?.lines || []).map((l) => [l.key, l]));
+    return state.items.map((i) => {
+      const l = byKey.get(i.key);
+      if (!l) return { ...i, available: true };
+      return { ...i, price: l.available ? l.price : i.price, mrp: l.available ? l.mrp : i.mrp, name: l.name || i.name, image: l.image || i.image, available: l.available, issue: l.issue, maxQty: l.maxQty };
+    });
+  }, [state.items, quote]);
+
+  const freeAt = Number(settings.freeDeliveryAbove) || 0;
+  const feeSetting = Number(settings.deliveryFee) || 0;
+
   const totals = useMemo(() => {
     const cartCount = state.items.reduce((n, i) => n + i.qty, 0);
+    if (quote && state.items.length) {
+      return {
+        cartCount, subtotal: quote.subtotal, mrpTotal: quote.mrpTotal, discount: quote.discount, offer: quote.offer, couponInfo: quote.coupon,
+        delivery: quote.delivery, total: quote.total, freeLeft: quote.freeLeft, youSaved: quote.youSaved, tax: quote.tax,
+        minOrder: quote.minOrder || 0, acceptingOrders: quote.acceptingOrders !== false, hasUnavailable: quote.lines.some((l) => !l.available),
+      };
+    }
+    // Backend not reachable (or still loading the first answer): simple local totals
     const subtotal = state.items.reduce((n, i) => n + i.price * i.qty, 0);
     const mrpTotal = state.items.reduce((n, i) => n + i.mrp * i.qty, 0);
-    const percent = state.coupon ? COUPONS[state.coupon].percent : 0;
-    const discount = Math.round((subtotal * percent) / 100);
-    const afterDiscount = subtotal - discount;
-    const delivery = state.items.length === 0 || afterDiscount >= FREE_DELIVERY_AT ? 0 : DELIVERY_FEE;
-    const total = afterDiscount + delivery;
-    const freeLeft = Math.max(FREE_DELIVERY_AT - afterDiscount, 0);
-    const youSaved = mrpTotal - subtotal + discount;
-    return { cartCount, subtotal, mrpTotal, discount, delivery, total, freeLeft, youSaved };
-  }, [state.items, state.coupon]);
+    const delivery = state.items.length === 0 || subtotal >= freeAt ? 0 : feeSetting;
+    return {
+      cartCount, subtotal, mrpTotal, discount: 0, offer: null, couponInfo: null, delivery, total: subtotal + delivery,
+      freeLeft: Math.max(freeAt - subtotal, 0), youSaved: mrpTotal - subtotal, tax: null, minOrder: 0, acceptingOrders: true, hasUnavailable: false,
+    };
+  }, [state.items, quote, freeAt, feeSetting]);
+
+  // Send the order to the backend. Throws an Error with a friendly message.
+  const checkout = useCallback(
+    async (customer, note) => {
+      const order = await sendOrder({
+        items: state.items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
+        coupon: state.coupon,
+        customer,
+        note,
+      });
+      dispatch({ type: 'CLEAR' });
+      return order;
+    },
+    [state.items, state.coupon]
+  );
 
   const value = useMemo(
     () => ({
-      items: state.items,
+      items: viewItems,
+      quoting,
+      checkout,
       wishlist: state.wishlist,
       coupon: state.coupon,
       wishCount: state.wishlist.length,
@@ -235,7 +328,7 @@ export function CartProvider({ children }) {
       removeCoupon,
       getQty,
     }),
-    [state, totals, addToCart, setQty, removeFromCart, toggleWishlist, clearCart, applyCoupon, removeCoupon, getQty]
+    [state, viewItems, quoting, checkout, totals, addToCart, setQty, removeFromCart, toggleWishlist, clearCart, applyCoupon, removeCoupon, getQty]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

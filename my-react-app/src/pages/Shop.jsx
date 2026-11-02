@@ -12,27 +12,27 @@ import ProductCard from '../components/ProductCard.jsx';
 import QuickView from '../components/QuickView.jsx';
 import FilterSheet, { NO_FILTERS, PRICE_RANGES, countActive } from '../components/FilterSheet.jsx';
 import BottomSheet from '../components/BottomSheet.jsx';
-import { getProducts } from '../lib/api.js';
+import { useSite } from '../context/SiteContext.jsx';
 import './Shop.css';
 
 // ---------- Curated Google Unsplash URLs for Categories & Products ----------
-const CATEGORY_FEATURED = [
+const CATEGORY_DEFAULT = [
   { name: 'Namkeen', note: 'Royal bhujia, mixes & dalmoth', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStSfT6_rGHxemzsOCFv7HYqqb5zTAGmz-Y1iQYpmG4gA&s=10', tone: 'brand' },
   { name: 'Khasta Puri', note: 'Flaky, golden & traditional', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5Z9XhJ7s2Jfh2Njv0UiT6CzE8T8vrL8em1CLChR4dHUVi5vBYuhBsNOA&s=10', tone: 'accent' },
   { name: 'Corn Puff', note: 'Light, airy & chatpata', img: 'https://5.imimg.com/data5/ANDROID/Default/2023/4/297400496/FV/JD/VV/23983265/product-jpeg.jpg', tone: 'ink' },
   { name: 'Sev', note: 'Ratlami, garlic & royal plain', img: 'https://cdn.tarladalal.com/media/recipe/mainphoto/2025/03/21/sev.webp', tone: 'white' },
 ];
 
-const FACTORY_VIDEO = '/videos/factory.mp4';
-const FACTORY_POSTER = 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=1200&auto=format&fit=crop';
+const FACTORY_VIDEO_DEFAULT = '/videos/factory.mp4';
+const FACTORY_POSTER_DEFAULT = 'https://images.unsplash.com/photo-1601050690597-df0568f70950?q=80&w=1200&auto=format&fit=crop';
 
-const QUOTES = [
+const QUOTES_DEFAULT = [
   { text: 'Crispy, fresh and never stale. Mera favourite!', who: 'Aarav Sharma, Pune' },
   { text: 'The ratlami sev is exactly like back home.', who: 'Priya Deshmukh, Nagpur' },
   { text: 'Whole family finished the khasta puri in one evening.', who: 'Rajesh Agrawal, Akola' },
 ];
 
-const CHAAT = [
+const CHAAT_DEFAULT = [
   { src: 'https://cdn.tarladalal.com/media/recipe/mainphoto/2025/03/21/sev.webp', caption: 'Pani puri chaat' },
   { src: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?q=80&w=800&auto=format&fit=crop', caption: 'Khasta kachori chaat' },
   { src: 'https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?q=80&w=800&auto=format&fit=crop', caption: 'Sev puri' },
@@ -61,7 +61,13 @@ function sortList(list, sort) {
 export default function Shop() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const [all, setAll] = useState(null);
+  const site = useSite();
+  const all = site.ready ? site.products : null;
+  const CATEGORY_FEATURED = site.live && site.categories.length
+    ? site.categories.map((c) => ({ name: c.name, note: c.note || '', img: c.image, tone: c.tone || 'brand' }))
+    : CATEGORY_DEFAULT;
+  const QUOTES = site.shop.quotes?.length ? site.shop.quotes : QUOTES_DEFAULT;
+  const CHAAT = site.shop.chaat?.length ? site.shop.chaat : CHAAT_DEFAULT;
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState('trending');
   const [filters, setFilters] = useState(NO_FILTERS);
@@ -71,12 +77,6 @@ export default function Shop() {
 
   const catParam = params.get('cat');
   const category = catParam || 'All';
-
-  useEffect(() => {
-    let live = true;
-    getProducts().then((list) => live && setAll(list));
-    return () => { live = false; };
-  }, []);
 
   const setCategory = (c) => {
     const next = new URLSearchParams(params);
@@ -288,6 +288,9 @@ export default function Shop() {
 }
 
 function FactoryVideo() {
+  const { shop } = useSite();
+  const FACTORY_VIDEO = shop.factoryVideo || FACTORY_VIDEO_DEFAULT;
+  const FACTORY_POSTER = shop.factoryPoster || FACTORY_POSTER_DEFAULT;
   const ref = useRef(null);
   const [playing, setPlaying] = useState(true);
   const [muted, setMuted] = useState(true);

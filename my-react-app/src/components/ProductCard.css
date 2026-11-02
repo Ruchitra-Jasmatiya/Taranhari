@@ -118,3 +118,8 @@
   .pcard__name { font-size: 1.35rem; }
   .pcard--compact { width: 260px; }
 }
+
+/* stock states (backend) */
+.pcard__off--sold { background: var(--ink); color: var(--on-ink); }
+.pcard__left { margin: 2px 0 0; font-size: 0.82rem; font-weight: 800; color: var(--brand, #e63312); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; transform: none; }

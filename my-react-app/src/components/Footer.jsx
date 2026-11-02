@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, Youtube } from 'lucide-react';
 import Logo from './Logo.jsx';
-import { CONTACT } from '../pages/Contact.jsx';
-import { CATEGORIES } from '../data/products.js';
+import { useSite } from '../context/SiteContext.jsx';
 import { THEMES, getTheme, setTheme } from '../lib/theme.js';
 import './Footer.css';
 
 export default function Footer() {
+  const { contact: CONTACT, categories, settings } = useSite();
+  const CATEGORIES = categories.map((c) => c.name);
   const [theme, setThemeState] = useState(getTheme());
   const year = new Date().getFullYear();
 
@@ -24,7 +25,7 @@ export default function Footer() {
       <div className="container footer__grid">
         <div className="footer__brand">
           <Logo size="md" />
-          <p className="footer__tag">Ek baar khao, baar baar maango. Fresh namkeen and snacks, made daily.</p>
+          <p className="footer__tag">{settings.tagline || 'Ek baar khao, baar baar maango'}. Fresh namkeen and snacks, made daily.</p>
           <ul className="footer__social" aria-label="Social media">
             <li>
               <a href={CONTACT.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
@@ -36,11 +37,13 @@ export default function Footer() {
                 <Facebook size={22} />
               </a>
             </li>
-            <li>
-              <a href={CONTACT.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-                <Youtube size={22} />
-              </a>
-            </li>
+            {CONTACT.youtube && (
+              <li>
+                <a href={CONTACT.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                  <Youtube size={22} />
+                </a>
+              </li>
+            )}
             <li>
               <a href={wa} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
                 <MessageCircle size={22} />
@@ -84,11 +87,13 @@ export default function Footer() {
                 <Mail size={18} aria-hidden="true" /> {CONTACT.email}
               </a>
             </li>
-            <li>
-              <span>
-                <MapPin size={18} aria-hidden="true" /> {CONTACT.addressShort}
-              </span>
-            </li>
+            {CONTACT.addressShort && (
+              <li>
+                <span>
+                  <MapPin size={18} aria-hidden="true" /> {CONTACT.addressShort}
+                </span>
+              </li>
+            )}
           </ul>
         </div>
       </div>

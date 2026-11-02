@@ -63,3 +63,8 @@
   .qv { grid-template-columns: 1fr 1.1fr; gap: var(--s-5); }
   .qv__media { aspect-ratio: 1 / 1; align-self: start; }
 }
+
+/* stock states (backend) */
+.chip.is-out { opacity: 0.5; text-decoration: line-through; }
+.chip.is-out.is-on { text-decoration: none; }
+.qv__left { margin: 0; font-weight: 800; color: var(--brand, #e63312); }

@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Taran Hari Admin</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23E63312'/%3E%3Ctext x='50' y='68' font-size='58' font-weight='800' text-anchor='middle' fill='%23FFC20E' font-family='Arial'%3ET%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --red:#E63312;--red-d:#B8260B;--red-l:#FDE4DE;
+  --gold:#FFC20E;--gold-d:#E0A800;--gold-l:#FFF1BD;
+  --brown:#2B1608;--brown-2:#3F2411;--cream:#FFF4D6;--paper:#FBF7EC;--card:#FFFFFF;
+  --line:#E9DDBF;--mute:#86704F;--ink:#2B1608;
+  --ok:#1F8A44;--ok-l:#DDF3E4;--warn:#B45309;--warn-l:#FEF0CC;--err:#C62828;--err-l:#FDE2E2;--blue:#1D4ED8;--blue-l:#E0E9FF;
+  --r:12px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--paper);color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--red-d)}
+.hidden{display:none!important}
+h2,h3,h4{margin:0}
+.muted{color:var(--mute)}
+.small{font-size:12px}
+.right{text-align:right}
+.nowrap{white-space:nowrap}
+.grow{flex:1}
+.mt{margin-top:14px}.mb{margin-bottom:14px}
+
+/* ---------- login ---------- */
+#login{min-height:100%;display:grid;place-items:center;padding:20px;background:var(--cream)}
+.login-card{width:100%;max-width:390px;background:#fff;border:2px solid var(--brown);border-radius:20px;padding:32px 28px;box-shadow:6px 6px 0 var(--brown);text-align:center}
+.logo-mark{width:64px;height:64px;margin:0 auto 10px;background:var(--red);color:var(--gold);border-radius:18px;display:grid;place-items:center;font-weight:800;font-size:34px;border:2px solid var(--brown)}
+.login-card h1{margin:4px 0 2px;font-size:23px}
+.login-card p{margin:0 0 20px;color:var(--mute)}
+.login-card input{width:100%;padding:13px 14px;border:2px solid var(--line);border-radius:12px;outline:none;font-size:15px;margin-bottom:12px;background:#fff}
+.login-card input:focus{border-color:var(--red)}
+.err{color:var(--err);font-size:13px;min-height:18px;margin:2px 0 8px}
+.warnbar{background:var(--warn-l);color:var(--warn);border:1px solid #F4D58A;border-radius:10px;padding:9px 12px;font-size:12.5px;margin-bottom:14px;text-align:left}
+.errbar{background:var(--err-l);color:var(--err);border:1px solid #F2B5B5}
+
+/* ---------- buttons / forms ---------- */
+.btn{border:2px solid var(--brown);border-radius:10px;padding:9px 15px;font-weight:700;background:var(--red);color:#fff;transition:transform .08s,box-shadow .08s;white-space:nowrap;box-shadow:2px 2px 0 var(--brown);display:inline-flex;align-items:center;gap:6px;justify-content:center;text-decoration:none;font-size:13.5px}
+.btn:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--brown)}
+.btn:active{transform:translate(1px,1px);box-shadow:0 0 0 var(--brown)}
+.btn:disabled{opacity:.55;cursor:wait;transform:none}
+.btn.gold{background:var(--gold);color:var(--brown)}
+.btn.ghost{background:#fff;color:var(--brown)}
+.btn.green{background:var(--ok)}
+.btn.danger{background:#fff;color:var(--err);border-color:var(--err);box-shadow:2px 2px 0 var(--err)}
+.btn.sm{padding:5px 10px;font-size:12px;border-radius:8px;box-shadow:1px 1px 0 var(--brown)}
+.btn.block{width:100%}
+.btn.lg{padding:13px 20px;font-size:15px}
+.icon-btn{width:30px;height:30px;border:2px solid var(--line);background:#fff;border-radius:8px;display:inline-grid;place-items:center;font-weight:800;line-height:1;padding:0}
+.icon-btn:hover{border-color:var(--brown)}
+label.f{display:block;font-weight:700;font-size:12px;margin:0 0 5px;color:#5C4328;text-transform:uppercase;letter-spacing:.03em}
+.f-in,.f-sel,.f-ta{width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:10px;background:#fff;outline:none;min-width:0}
+.f-in:focus,.f-sel:focus,.f-ta:focus{border-color:var(--red)}
+.f-ta{min-height:76px;resize:vertical}
+.f-in.sm,.f-sel.sm{padding:6px 8px;font-size:13px;border-radius:8px}
+.row{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-bottom:14px}
+.row.r2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.hint{font-size:12px;color:var(--mute);margin-top:4px}
+.switch{position:relative;display:inline-block;width:40px;height:23px;flex:none}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch span{position:absolute;inset:0;background:#D8CBAA;border-radius:23px;transition:.15s;cursor:pointer;border:2px solid var(--brown)}
+.switch span:before{content:"";position:absolute;height:13px;width:13px;left:2px;top:2px;background:#fff;border:2px solid var(--brown);border-radius:50%;transition:.15s;box-sizing:content-box;height:11px;width:11px}
+.switch input:checked+span{background:var(--ok)}
+.switch input:checked+span:before{transform:translateX(17px)}
+.chk{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13px}
+
+/* ---------- shell ---------- */
+#app{display:grid;grid-template-columns:236px 1fr;min-height:100%}
+aside{background:var(--brown);color:var(--cream);padding:16px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px}
+.brand .logo-mark{width:40px;height:40px;font-size:22px;border-radius:11px;margin:0;border-color:var(--gold)}
+.brand b{display:block;font-size:16px;color:#fff;line-height:1.1}
+.brand small{color:var(--gold);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.navgroup{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#B79B73;padding:12px 10px 4px}
+.nav{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;color:var(--cream);padding:9px 10px;border-radius:9px;font-weight:600;font-size:13.5px}
+.nav:hover{background:var(--brown-2)}
+.nav.on{background:var(--gold);color:var(--brown)}
+.nav .ic{width:20px;text-align:center;font-size:15px}
+.nav .count{margin-left:auto;background:var(--red);color:#fff;border-radius:99px;font-size:11px;padding:1px 7px;font-weight:700}
+.side-foot{margin-top:auto;padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.side-foot .btn{width:100%}
+main{min-width:0;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;gap:12px;padding:14px 22px;background:#fff;border-bottom:2px solid var(--line);position:sticky;top:0;z-index:20}
+.top h2{font-size:19px}
+.menu-btn{display:none}
+#view{padding:22px;max-width:1280px;width:100%}
+.backdrop{display:none}
+@media(max-width:920px){
+  #app{grid-template-columns:1fr}
+  aside{position:fixed;left:0;top:0;bottom:0;width:260px;z-index:60;transform:translateX(-100%);transition:transform .18s}
+  aside.open{transform:none}
+  aside.open+.backdrop{display:block;position:fixed;inset:0;background:rgba(43,22,8,.5);z-index:55}
+  .menu-btn{display:inline-grid}
+  #view{padding:14px}
+  .top{padding:10px 14px}
+}
+
+/* ---------- cards / tables ---------- */
+.card{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:16px}
+.card>h3,.card-h{font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-h .grow{flex:1}
+.stats{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:16px}
+.stat{background:#fff;border:2px solid var(--brown);border-radius:var(--r);padding:14px 16px;box-shadow:3px 3px 0 var(--brown)}
+.stat .lbl{font-size:11.5px;color:var(--mute);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.stat .val{font-size:25px;font-weight:800;margin-top:4px}
+.stat .sub{font-size:12px;color:var(--mute);margin-top:2px}
+.stat.red{background:var(--red);color:#fff}.stat.red .lbl,.stat.red .sub{color:#FFD9D0}
+.stat.gold{background:var(--gold)}.stat.gold .lbl,.stat.gold .sub{color:#6B4F00}
+.tools{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center}
+.tools .f-in,.tools .f-sel{width:auto;min-width:150px}
+.tools .search{flex:1;min-width:190px}
+.tablewrap{overflow-x:auto;border:2px solid var(--line);border-radius:var(--r);background:#fff}
+table{width:100%;border-collapse:collapse;min-width:640px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);padding:10px 12px;background:var(--cream);border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr.click{cursor:pointer}
+tbody tr.click:hover{background:#FFFBEA}
+.thumb{width:44px;height:44px;border-radius:9px;object-fit:cover;background:var(--cream);border:2px solid var(--line);flex:none}
+.pname{display:flex;align-items:center;gap:10px;min-width:180px}
+.pname b{display:block}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:700;background:var(--cream);color:var(--brown);white-space:nowrap}
+.pill.ok{background:var(--ok-l);color:var(--ok)}.pill.warn{background:var(--warn-l);color:var(--warn)}.pill.err{background:var(--err-l);color:var(--err)}.pill.blue{background:var(--blue-l);color:var(--blue)}.pill.gold{background:var(--gold-l);color:#7A5A00}
+.empty{padding:40px 16px;text-align:center;color:var(--mute)}
+.empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:4px}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+.grid3{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+@media(max-width:920px){.grid2{grid-template-columns:1fr}}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{border:2px solid var(--line);background:#fff;border-radius:99px;padding:6px 14px;font-weight:700;font-size:12.5px}
+.tab.on{background:var(--brown);color:var(--cream);border-color:var(--brown)}
+.tab .n{opacity:.7;margin-left:4px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;margin:0;font-size:13.5px}
+.kv dt{color:var(--mute);font-weight:600}.kv dd{margin:0}
+.totals{margin-left:auto;max-width:330px;width:100%}
+.totals div{display:flex;justify-content:space-between;padding:3px 0}
+.totals .big{font-size:18px;font-weight:800;border-top:2px solid var(--brown);margin-top:6px;padding-top:8px}
+.neg{color:var(--ok)}
+
+/* bars */
+.chart{width:100%;height:190px}
+.chart text{font-size:11px;fill:var(--mute);font-family:inherit}
+.chart .v{fill:var(--brown);font-weight:700}
+.bar{display:flex;align-items:center;gap:10px;margin:7px 0}
+.bar .track{flex:1;height:10px;background:var(--cream);border-radius:9px;overflow:hidden}
+.bar .fill{height:100%;background:var(--red)}
+
+/* modal */
+#modal,#confirm{position:fixed;inset:0;background:rgba(43,22,8,.55);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow-y:auto}
+#confirm{z-index:120;align-items:center}
+.mbox{background:#fff;border:2px solid var(--brown);border-radius:16px;width:100%;max-width:640px;box-shadow:6px 6px 0 var(--brown)}
+.mbox.wide{max-width:880px}
+.mhead{display:flex;align-items:center;padding:14px 18px;border-bottom:2px solid var(--line);gap:10px}
+.mhead h3{flex:1;font-size:17px}
+.mhead .x{border:0;background:none;font-size:26px;line-height:1;color:var(--mute);padding:0 4px}
+.mbody{padding:18px}
+.mfoot{padding:12px 18px;border-top:2px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;background:var(--paper);border-radius:0 0 14px 14px}
+#toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:200}
+.toast{background:var(--brown);color:#fff;padding:11px 16px;border-radius:10px;font-weight:600;box-shadow:3px 3px 0 var(--gold);max-width:340px;border:2px solid var(--brown)}
+.toast.ok{background:var(--ok);border-color:#0F5E2B}.toast.err{background:var(--err);border-color:#7F1111}
+
+/* image field */
+.imgfield{display:flex;gap:8px;align-items:center}
+.imgfield img{width:46px;height:46px;border-radius:9px;object-fit:cover;background:var(--cream);border:2px solid var(--line);flex:none}
+
+/* repeater */
+.rep{border:2px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#FFFEF9}
+.rep-h{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.rep-h b{flex:1;font-size:12.5px;color:var(--mute)}
+.size-row{display:grid;grid-template-columns:1.1fr 1fr 1fr 1fr auto auto;gap:8px;align-items:center;margin-bottom:8px}
+.size-head{font-size:11px;text-transform:uppercase;color:var(--mute);font-weight:700}
+@media(max-width:620px){.size-row{grid-template-columns:1fr 1fr}.size-head{display:none}}
+.banner-default{background:var(--gold-l);border:2px dashed var(--gold-d);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px}
+
+/* billing */
+.pos{display:grid;grid-template-columns:1fr 390px;gap:16px;align-items:start}
+@media(max-width:1100px){.pos{grid-template-columns:1fr}}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.pcard{background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;text-align:left}
+.pcard:hover{border-color:var(--brown)}
+.pcard img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;background:var(--cream)}
+.pcard.out{opacity:.5}
+.pcard b{font-size:13px;line-height:1.2}
+.bill-line{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.stepper{display:inline-flex;align-items:center;gap:4px}
+.stepper input{width:46px;text-align:center;padding:4px;border:2px solid var(--line);border-radius:7px}
+.sticky{position:sticky;top:76px}
+
+/* timeline */
+.tl{list-style:none;padding:0;margin:0}
+.tl li{display:flex;gap:10px;padding:5px 0;font-size:13px}
+.tl i{width:10px;height:10px;border-radius:50%;background:var(--gold-d);margin-top:5px;flex:none;border:2px solid var(--brown)}
+</style>
+</head>
+<body>
+
+<!-- ============================ LOGIN ============================ -->
+<section id="login" class="hidden">
+  <form class="login-card" id="loginForm" autocomplete="on">
+    <div class="logo-mark">T</div>
+    <h1>Taran Hari Admin</h1>
+    <p>Sign in to manage your store</p>
+    <div id="loginWarn"></div>
+    <input type="password" id="pw" placeholder="Admin password" autocomplete="current-password" required>
+    <div class="err" id="loginErr"></div>
+    <button class="btn block lg" id="loginBtn">Sign in</button>
+  </form>
+</section>
+
+<!-- ============================== APP ============================== -->
+<div id="app" class="hidden">
+  <aside id="side">
+    <div class="brand"><div class="logo-mark">T</div><div><b>Taran Hari</b><small>Admin panel</small></div></div>
+    <div class="navgroup">Overview</div>
+    <button class="nav" data-view="dashboard"><span class="ic">&#9632;</span>Dashboard</button>
+    <div class="navgroup">Sales</div>
+    <button class="nav" data-view="orders"><span class="ic">&#9776;</span>Orders<span class="count hidden" id="pendingBadge">0</span></button>
+    <button class="nav" data-view="billing"><span class="ic">&#9998;</span>Billing</button>
+    <button class="nav" data-view="customers"><span class="ic">&#9786;</span>Customers</button>
+    <div class="navgroup">Catalogue</div>
+    <button class="nav" data-view="products"><span class="ic">&#9733;</span>Products</button>
+    <button class="nav" data-view="stock"><span class="ic">&#9635;</span>Stock<span class="count hidden" id="stockBadge">0</span></button>
+    <button class="nav" data-view="categories"><span class="ic">&#9830;</span>Categories</button>
+    <div class="navgroup">Discounts</div>
+    <button class="nav" data-view="coupons"><span class="ic">%</span>Coupons</button>
+    <button class="nav" data-view="offers"><span class="ic">&#9733;</span>Offers &amp; sales</button>
+    <div class="navgroup">Website pages</div>
+    <button class="nav" data-view="p-home"><span class="ic">&#8962;</span>Home page</button>
+    <button class="nav" data-view="p-shop"><span class="ic">&#9873;</span>Shop page</button>
+    <button class="nav" data-view="p-contact"><span class="ic">&#9742;</span>Contact page</button>
+    <div class="navgroup">Store</div>
+    <button class="nav" data-view="settings"><span class="ic">&#9881;</span>Settings</button>
+    <div class="side-foot">
+      <a class="btn gold" href="/" target="_blank" rel="noopener">View website</a>
+      <button class="btn ghost" id="logoutBtn">Log out</button>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+  <main>
+    <header class="top">
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">&#9776;</button>
+      <h2 id="title">Dashboard</h2>
+      <span class="grow"></span>
+      <span id="topExtra"></span>
+    </header>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div id="modal" class="hidden"></div>
+<div id="confirm" class="hidden"></div>
+<div id="toasts"></div>
+
+<script>
+'use strict';
+/* ====================================================================
+   Taran Hari admin panel - plain JavaScript, no build step.
+   Talks to the backend under /api/admin/* using the login cookie.
+   ==================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const inr = (n) => '₹' + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+const when = (t) => new Date(t).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+const dateOnly = (t) => new Date(t).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+const digitsOf = (s) => String(s || '').replace(/\D/g, '');
+const STATUS = { pending: 'Pending', confirmed: 'Confirmed', packed: 'Packed', out_for_delivery: 'Out for delivery', delivered: 'Delivered', cancelled: 'Cancelled' };
+const STATUS_CLS = { pending: 'warn', confirmed: 'blue', packed: 'blue', out_for_delivery: 'gold', delivered: 'ok', cancelled: 'err' };
+const NEXT = { pending: 'confirmed', confirmed: 'packed', packed: 'out_for_delivery', out_for_delivery: 'delivered' };
+const NEXT_LABEL = { confirmed: 'Confirm order', packed: 'Mark packed', out_for_delivery: 'Out for delivery', delivered: 'Mark delivered' };
+const PAYLBL = { cod: 'Cash on delivery', cash: 'Cash', upi: 'UPI', card: 'Card', online: 'Online' };
+const waLink = (phone, text) => { const d = digitsOf(phone); const n = d.length === 10 ? '91' + d : d; return `https://wa.me/${n}${text ? '?text=' + encodeURIComponent(text) : ''}`; };
+
+let bc = null; try { bc = new BroadcastChannel('th-sync'); } catch { /* not supported */ }
+async function api(method, path, body) {
+  const r = await fetch('/api' + path, { method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'th-admin' }, body: body !== undefined ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({}));
+  if (r.status === 401 && !path.includes('/admin/login')) { showLogin(); throw new Error('Please log in again'); }
+  if (!r.ok) throw new Error(j.error || 'Request failed (' + r.status + ')');
+  if (method !== 'GET' && bc) bc.postMessage('catalog'); // open website tabs refresh instantly
+  return j;
+}
+function toast(msg, kind = '') {
+  const d = document.createElement('div'); d.className = 'toast ' + kind; d.textContent = msg;
+  $('#toasts').appendChild(d); setTimeout(() => d.remove(), 4200);
+}
+async function act(btn, fn, okMsg) {
+  const old = btn && btn.innerHTML; if (btn) btn.disabled = true;
+  try { const r = await fn(); if (okMsg) toast(okMsg, 'ok'); return r; }
+  catch (e) { toast(e.message, 'err'); }
+  finally { if (btn) { btn.disabled = false; btn.innerHTML = old; } }
+}
+function beep() {
+  try { const c = new (window.AudioContext || window.webkitAudioContext)(); const o = c.createOscillator(); const g = c.createGain(); o.connect(g); g.connect(c.destination); o.frequency.value = 880; g.gain.setValueAtTime(0.15, c.currentTime); g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.5); o.start(); o.stop(c.currentTime + 0.5); } catch { /* no audio */ }
+}
+function openModal(title, body, foot, wide) {
+  const m = $('#modal');
+  m.innerHTML = `<div class="mbox ${wide ? 'wide' : ''}"><div class="mhead"><h3>${esc(title)}</h3><button class="x" data-close aria-label="Close">&times;</button></div><div class="mbody">${body}</div>${foot ? `<div class="mfoot">${foot}</div>` : ''}</div>`;
+  m.classList.remove('hidden'); document.body.style.overflow = 'hidden';
+  m.onmousedown = (e) => { if (e.target === m) closeModal(); };
+  m.onclick = (e) => { if (e.target.closest('[data-close]')) closeModal(); };
+  return m;
+}
+function closeModal() { $('#modal').classList.add('hidden'); $('#modal').innerHTML = ''; document.body.style.overflow = ''; }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('#confirm').classList.contains('hidden')) $('#confirm').classList.add('hidden'); else closeModal(); } });
+function confirmBox(message, okLabel = 'Yes, do it', danger = true) {
+  return new Promise((resolve) => {
+    const c = $('#confirm');
+    c.innerHTML = `<div class="mbox" style="max-width:420px"><div class="mbody"><p style="margin:0 0 4px;font-size:15px;font-weight:600">${esc(message)}</p></div><div class="mfoot"><button class="btn ghost" id="cNo">Cancel</button><button class="btn ${danger ? 'danger' : ''}" id="cYes">${esc(okLabel)}</button></div></div>`;
+    c.classList.remove('hidden');
+    const done = (v) => { c.classList.add('hidden'); c.innerHTML = ''; resolve(v); };
+    $('#cNo').onclick = () => done(false); $('#cYes').onclick = () => done(true);
+  });
+}
+const sw = (checked, attrs = '') => `<label class="switch"><input type="checkbox" ${checked ? 'checked' : ''} ${attrs}><span></span></label>`;
+const fld = (label, html, hint) => `<div><label class="f">${label}</label>${html}${hint ? `<div class="hint">${hint}</div>` : ''}</div>`;
+const imgOrBlank = (src) => `<img class="thumb" src="${esc(src || '')}" alt="" onerror="this.style.visibility='hidden'">`;
+
+/* ---- image upload: shrink in the browser first, then store through the API ---- */
+function compress(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => {
+      let max = 1100; const useWebp = document.createElement('canvas').toDataURL('image/webp').startsWith('data:image/webp');
+      const type = file.type === 'image/gif' && file.size < 600000 ? 'image/gif' : useWebp ? 'image/webp' : 'image/jpeg';
+      if (type === 'image/gif') { const fr = new FileReader(); fr.onload = () => resolve(fr.result); fr.readAsDataURL(file); return; }
+      for (let q = 0.85; ; q -= 0.1) {
+        const sc = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas'); c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        const d = c.toDataURL(type, q);
+        if (d.length * 0.75 < 520000 || (q < 0.4 && max < 500)) { URL.revokeObjectURL(url); return resolve(d); }
+        if (q < 0.45) { max *= 0.75; q = 0.95; }
+      }
+    };
+    img.onerror = () => reject(new Error('Could not read that image'));
+    img.src = url;
+  });
+}
+/** A picture field: paste a link OR upload from your phone/computer. `name` is the form key. */
+function imageField(name, label, value, extra = '') {
+  return `<div><label class="f">${label}</label><div class="imgfield" data-imgfield>
+    <img src="${esc(value || '')}" alt="" onerror="this.style.visibility='hidden'" onload="this.style.visibility='visible'">
+    <input class="f-in" name="${name}" value="${esc(value || '')}" placeholder="Paste image link or upload →" ${extra}>
+    <label class="btn ghost sm" style="cursor:pointer"><span>Upload</span><input type="file" accept="image/*" hidden></label></div></div>`;
+}
+document.addEventListener('change', async (e) => {
+  const fi = e.target.closest('[data-imgfield] input[type=file]'); if (!fi || !fi.files[0]) return;
+  const box = fi.closest('[data-imgfield]'); const lab = fi.previousElementSibling; const old = lab.textContent; lab.textContent = 'Uploading…';
+  try {
+    const dataUrl = await compress(fi.files[0]);
+    const r = await api('POST', '/admin/upload', { dataUrl });
+    const inp = $('input.f-in', box); inp.value = r.url; $('img', box).src = r.url;
+    inp.dispatchEvent(new Event('input', { bubbles: true })); toast('Image uploaded', 'ok');
+  } catch (err) { toast(err.message, 'err'); }
+  lab.textContent = old; fi.value = '';
+});
+document.addEventListener('input', (e) => { const i = e.target.closest('[data-imgfield] input.f-in'); if (i) $('img', i.closest('[data-imgfield]')).src = i.value; });
+
+/* ===================== printing: slip (80mm) and A4 invoice ===================== */
+function billHtml(o, st, mode) {
+  const inv = st.invoice || {}; const biz = inv.businessName || st.shopName || 'Taran Hari';
+  const rows = o.items.map((i) => `<tr><td>${esc(i.name)}<br><small>${esc(i.size)}</small></td><td class="c">${i.qty}</td><td class="r">${(+i.price).toFixed(2)}</td><td class="r">${(+i.lineTotal).toFixed(2)}</td></tr>`).join('');
+  const t = [['Subtotal', o.subtotal]];
+  if (o.offer) t.push([`Offer: ${o.offer.name}`, -o.offer.amount]);
+  if (o.coupon) t.push([`Coupon ${o.coupon.code}`, -o.coupon.amount]);
+  if (o.manualDiscount) t.push(['Discount', -o.manualDiscount]);
+  if (o.delivery) t.push(['Delivery', o.delivery]);
+  const tl = t.map(([k, v]) => `<tr><td colspan="3" class="r">${esc(k)}</td><td class="r">${v < 0 ? '-' : ''}${Math.abs(v).toFixed(2)}</td></tr>`).join('');
+  const taxLine = o.tax && o.tax.percent > 0 ? `<div class="note">Total includes GST @ ${o.tax.percent}% = ${inr(o.tax.amount)}</div>` : '';
+  const c = o.customer || {}; const paid = o.payment?.status === 'paid';
+  const css = mode === 'slip'
+    ? '@page{size:80mm auto;margin:3mm}body{width:72mm;font:12px/1.35 "Courier New",monospace;margin:0 auto}h1{font-size:16px;text-align:center;margin:0}.c{text-align:center}.top{text-align:center;font-size:11px}'
+    : '@page{size:A4;margin:14mm}body{font:13.5px/1.45 Arial,sans-serif;max-width:760px;margin:0 auto}h1{font-size:26px;margin:0}.top{font-size:12.5px;color:#444}th{background:#f3ead0}';
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(o.number)}</title><style>
+*{box-sizing:border-box}${css}
+table{width:100%;border-collapse:collapse;margin:8px 0}th,td{padding:4px 3px;text-align:left;vertical-align:top}th{border-bottom:1px solid #000;border-top:1px solid #000}
+.r{text-align:right}.c{text-align:center}td small{color:#666}hr{border:0;border-top:1px dashed #000;margin:8px 0}.tot td{border-top:1px solid #000;font-weight:700;font-size:1.15em}
+.meta{display:flex;justify-content:space-between;gap:10px;margin:6px 0;font-size:.95em}.note{font-size:.9em;margin:4px 0}.badge{display:inline-block;border:1px solid #000;padding:1px 8px;font-weight:700}
+@media print{button{display:none}}</style></head><body>
+<h1>${esc(biz)}</h1><div class="top">${esc(inv.address || '')}${inv.phone ? '<br>Ph: ' + esc(inv.phone) : ''}${inv.email ? ' | ' + esc(inv.email) : ''}${inv.gstin ? '<br>GSTIN: ' + esc(inv.gstin) : ''}</div><hr>
+<div class="meta"><span><b>${mode === 'slip' ? 'Bill' : 'Invoice'}: ${esc(o.number)}</b></span><span>${esc(when(o.createdAt))}</span></div>
+${c.name || c.phone ? `<div class="note">Customer: <b>${esc(c.name || '')}</b>${c.phone ? ' | ' + esc(c.phone) : ''}${c.address ? '<br>' + esc(c.address) + (c.city ? ', ' + esc(c.city) : '') + (c.pincode ? ' - ' + esc(c.pincode) : '') : ''}</div>` : ''}
+<table><thead><tr><th>Item</th><th class="c">Qty</th><th class="r">Rate</th><th class="r">Amt</th></tr></thead><tbody>${rows}${tl}<tr class="tot"><td colspan="3" class="r">TOTAL ${esc(st.currency || '₹')}</td><td class="r">${(+o.total).toFixed(2)}</td></tr></tbody></table>
+${taxLine}
+<div class="note">Payment: <span class="badge">${paid ? 'PAID' : 'PAYMENT DUE'}</span> ${esc(PAYLBL[o.payment?.method] || '')}</div>
+${!paid && inv.upiId ? `<div class="note">Pay by UPI: <b>${esc(inv.upiId)}</b></div>` : ''}
+${o.note ? `<div class="note">Note: ${esc(o.note)}</div>` : ''}
+<hr><div class="c note">${esc(inv.footerNote || 'Thank you for shopping with us!')}</div></body></html>`;
+}
+function printBill(o, st, mode = 'slip') {
+  const w = window.open('', '_blank', 'width=' + (mode === 'slip' ? 420 : 900) + ',height=720');
+  if (!w) { toast('Please allow pop-ups for this site to print', 'err'); return; }
+  w.document.open(); w.document.write(billHtml(o, st, mode)); w.document.close(); w.focus();
+  setTimeout(() => { try { w.print(); } catch { /* user can press Ctrl+P */ } }, 450);
+}
+
+/* =============================== shell & login =============================== */
+const S = { view: 'dashboard', storage: null, lastOrderId: null, settings: null, cats: [] };
+const TITLES = { dashboard: 'Dashboard', orders: 'Orders', billing: 'Billing', customers: 'Customers', products: 'Products', stock: 'Stock', categories: 'Categories', coupons: 'Coupons', offers: 'Offers & sales', 'p-home': 'Home page', 'p-shop': 'Shop page', 'p-contact': 'Contact page', settings: 'Settings' };
+const VIEWS = {};
+function showLogin(msg) {
+  $('#app').classList.add('hidden'); $('#login').classList.remove('hidden'); clearInterval(S.poll);
+  if (msg) $('#loginErr').textContent = msg;
+  setTimeout(() => $('#pw').focus(), 50);
+}
+async function boot() {
+  try {
+    const s = await fetch('/api/admin/session', { credentials: 'same-origin' }).then((r) => r.json());
+    S.storage = s.storage;
+    if (!s.authenticated) return showLogin();
+    enter();
+  } catch { showLogin('Cannot reach the server'); }
+}
+function enter() {
+  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+  const v = location.hash.slice(1); go(TITLES[v] ? v : 'dashboard');
+  clearInterval(S.poll); S.poll = setInterval(pollOrders, 8000); pollOrders(true);
+}
+$('#loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault(); const b = $('#loginBtn'); b.disabled = true; $('#loginErr').textContent = '';
+  try {
+    const r = await api('POST', '/admin/login', { password: $('#pw').value });
+    $('#pw').value = '';
+    const s = await fetch('/api/admin/session', { credentials: 'same-origin' }).then((x) => x.json()); S.storage = s.storage; S.defaultPw = r.usingDefaultPassword; enter();
+  } catch (err) { $('#loginErr').textContent = err.message; }
+  b.disabled = false;
+});
+$('#logoutBtn').onclick = async () => { await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'th-admin' }, body: '{}' }); showLogin(); };
+$('#menuBtn').onclick = () => $('#side').classList.toggle('open');
+$('#backdrop').onclick = () => $('#side').classList.remove('open');
+$$('.nav').forEach((b) => { b.onclick = () => { go(b.dataset.view); $('#side').classList.remove('open'); }; });
+window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (TITLES[v] && v !== S.view && !$('#app').classList.contains('hidden')) go(v); });
+
+async function go(view) {
+  S.view = view; location.hash = view; $('#title').textContent = TITLES[view]; $('#topExtra').innerHTML = '';
+  $$('.nav').forEach((b) => b.classList.toggle('on', b.dataset.view === view));
+  const v = $('#view'); v.innerHTML = '<div class="empty">Loading…</div>'; window.scrollTo(0, 0);
+  try { await VIEWS[view](); } catch (e) { if (S.view === view) v.innerHTML = `<div class="empty"><b>Something went wrong</b>${esc(e.message)}<br><br><button class="btn" onclick="go('${view}')">Try again</button></div>`; }
+}
+async function loadCats() { S.cats = (await api('GET', '/admin/categories')).categories; return S.cats; }
+const storageWarning = () => (S.storage && !S.storage.persistent ? `<div class="warnbar errbar"><b>Database not connected.</b> Your changes will be lost when the server restarts. In Vercel: Storage &rarr; Upstash Redis &rarr; connect it to this project, then redeploy.</div>` : '');
+const passWarning = () => (S.defaultPw ? `<div class="warnbar"><b>You are using the default password (admin123).</b> Set <code>ADMIN_PASSWORD</code> in Vercel &rarr; Settings &rarr; Environment Variables, or change it under Settings.</div>` : '');
+
+async function pollOrders(first) {
+  try {
+    const [latest, pend] = await Promise.all([api('GET', '/admin/orders?limit=1'), api('GET', '/admin/orders?status=pending&limit=1')]);
+    const o = latest.orders[0];
+    $('#pendingBadge').textContent = pend.total; $('#pendingBadge').classList.toggle('hidden', !pend.total);
+    if (o && S.lastOrderId !== null && o.id > S.lastOrderId && o.source === 'web') {
+      beep(); toast(`New order ${o.number} – ${inr(o.total)} from ${o.customer.name}`, 'ok');
+      if (S.view === 'orders') VIEWS.orders(); else if (S.view === 'dashboard') VIEWS.dashboard();
+    }
+    S.lastOrderId = o ? o.id : 0;
+    if (first || Math.random() < 0.15) refreshStockBadge();
+  } catch { /* ignore network blips */ }
+}
+async function refreshStockBadge() {
+  try { const s = await api('GET', '/admin/stats?tz=330'); const n = s.totals.lowStock + s.totals.outOfStock; $('#stockBadge').textContent = n; $('#stockBadge').classList.toggle('hidden', !n); } catch { /* ignore */ }
+}
+
+/* ================================= DASHBOARD ================================= */
+VIEWS.dashboard = async () => {
+  const d = await api('GET', '/admin/stats?tz=' + -new Date().getTimezoneOffset());
+  const t = d.totals; const max = Math.max(1, ...d.days.map((x) => x.revenue));
+  const bars = d.days.map((x, i) => { const h = Math.round((x.revenue / max) * 118); const bx = 18 + i * 76; return `<rect x="${bx}" y="${150 - h}" width="48" height="${h}" rx="6" fill="${i === 6 ? '#E63312' : '#FFC20E'}" stroke="#2B1608" stroke-width="2"/><text class="v" x="${bx + 24}" y="${142 - h}" text-anchor="middle">${x.revenue ? inr(x.revenue).replace('₹', '₹') : ''}</text><text x="${bx + 24}" y="172" text-anchor="middle">${esc(x.label)}</text><text x="${bx + 24}" y="186" text-anchor="middle">${x.orders} ord</text>`; }).join('');
+  const topMax = Math.max(1, ...d.top.map((x) => x.qty));
+  $('#view').innerHTML = `${storageWarning()}${passWarning()}
+  <div class="stats">
+    <div class="stat red"><div class="lbl">Today's sales</div><div class="val">${inr(t.todayRevenue)}</div><div class="sub">${t.todayOrders} orders today</div></div>
+    <div class="stat gold"><div class="lbl">This week</div><div class="val">${inr(t.weekRevenue)}</div><div class="sub">${t.weekOrders} orders</div></div>
+    <div class="stat"><div class="lbl">This month</div><div class="val">${inr(t.monthRevenue)}</div><div class="sub">Average order ${inr(t.avgOrder)}</div></div>
+    <div class="stat"><div class="lbl">Pending orders</div><div class="val">${t.pending}</div><div class="sub"><a href="#orders">Open orders</a></div></div>
+    <div class="stat"><div class="lbl">Stock alerts</div><div class="val">${t.outOfStock + t.lowStock}</div><div class="sub">${t.outOfStock} out &bull; ${t.lowStock} low</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Sales &mdash; last 7 days</h3><svg class="chart" viewBox="0 0 560 192" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Sales for the last seven days">${bars}</svg></div>
+    <div class="card"><h3>Best sellers <span class="muted small">(last 30 days)</span></h3>${d.top.length ? d.top.map((x) => `<div class="bar"><div style="width:42%"><b>${esc(x.name)}</b><div class="small muted">${inr(x.revenue)}</div></div><div class="track"><div class="fill" style="width:${Math.round(x.qty / topMax * 100)}%"></div></div><b>${x.qty}</b></div>`).join('') : '<div class="empty">No sales yet</div>'}</div>
+  </div>
+  <div class="grid2">
+    <div class="card"><div class="card-h"><h3 class="grow">Low &amp; out of stock</h3><a class="btn sm ghost" href="#stock">Manage stock</a></div>${d.lowStock.length ? `<div class="tablewrap"><table><tbody>${d.lowStock.map((x) => `<tr><td><div class="pname">${imgOrBlank(x.image)}<span><b>${esc(x.name)}</b><span class="small muted">${esc(x.category)} &bull; ${esc(x.size)}</span></span></div></td><td class="right"><span class="pill ${x.stock <= 0 ? 'err' : 'warn'}">${x.stock <= 0 ? 'Out of stock' : x.stock + ' left'}</span></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty"><b>All stocked up</b>Nothing is running low.</div>'}</div>
+    <div class="card"><div class="card-h"><h3 class="grow">Recent orders</h3><a class="btn sm ghost" href="#orders">All orders</a></div>${d.recent.length ? `<div class="tablewrap"><table><tbody>${d.recent.map((o) => `<tr class="click" data-order="${o.id}"><td><b>${esc(o.number)}</b><div class="small muted">${when(o.createdAt)}</div></td><td>${esc(o.customer.name)}</td><td class="right">${inr(o.total)}</td><td><span class="pill ${STATUS_CLS[o.status]}">${STATUS[o.status]}</span></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty"><b>No orders yet</b>They will show up here.</div>'}</div>
+  </div>`;
+  $$('[data-order]').forEach((r) => { r.onclick = () => openOrder(r.dataset.order); });
+  const n = t.lowStock + t.outOfStock; $('#stockBadge').textContent = n; $('#stockBadge').classList.toggle('hidden', !n);
+};
+
+/* ================================== ORDERS ================================== */
+const F = { orderTab: 'all', orderQ: '', orderSrc: '' };
+VIEWS.orders = async () => {
+  const r = await api('GET', '/admin/orders?limit=300'); const all = r.orders;
+  const counts = { all: all.length }; for (const k of Object.keys(STATUS)) counts[k] = all.filter((o) => o.status === k).length;
+  const draw = () => {
+    let list = all;
+    if (F.orderTab !== 'all') list = list.filter((o) => o.status === F.orderTab);
+    if (F.orderSrc) list = list.filter((o) => o.source === F.orderSrc);
+    const q = F.orderQ.toLowerCase(); if (q) list = list.filter((o) => `${o.number} ${o.customer.name} ${o.customer.phone} ${o.customer.address}`.toLowerCase().includes(q));
+    $('#orderRows').innerHTML = list.length ? list.map((o) => `<tr class="click" data-order="${o.id}"><td><b>${esc(o.number)}</b><div class="small muted">${when(o.createdAt)}</div></td><td><b>${esc(o.customer.name)}</b><div class="small muted">${esc(o.customer.phone || '')}</div></td><td class="small">${o.items.slice(0, 2).map((i) => `${i.qty}&times; ${esc(i.name)}`).join(', ')}${o.items.length > 2 ? ` +${o.items.length - 2} more` : ''}</td><td class="right nowrap"><b>${inr(o.total)}</b></td><td><span class="pill ${o.payment.status === 'paid' ? 'ok' : o.payment.status === 'refund-due' ? 'err' : 'warn'}">${o.payment.status === 'paid' ? 'Paid' : o.payment.status === 'refund-due' ? 'Refund due' : 'Unpaid'}</span> <span class="small muted">${PAYLBL[o.payment.method] || ''}</span></td><td><span class="pill ${STATUS_CLS[o.status]}">${STATUS[o.status]}</span>${o.source === 'pos' ? ' <span class="pill gold">Counter</span>' : ''}</td></tr>`).join('') : '<tr><td colspan="6"><div class="empty"><b>No orders here</b>Orders from your website and counter bills appear in this list.</div></td></tr>';
+    $$('#orderRows [data-order]').forEach((x) => { x.onclick = () => openOrder(x.dataset.order); });
+  };
+  $('#view').innerHTML = `${storageWarning()}
+  <div class="tabs">${['all', ...Object.keys(STATUS)].map((k) => `<button class="tab ${F.orderTab === k ? 'on' : ''}" data-tab="${k}">${k === 'all' ? 'All' : STATUS[k]}<span class="n">${counts[k]}</span></button>`).join('')}</div>
+  <div class="tools"><input class="f-in search" id="oq" placeholder="Search order no, name, phone, address…" value="${esc(F.orderQ)}"><select class="f-sel" id="osrc"><option value="">Website + counter</option><option value="web" ${F.orderSrc === 'web' ? 'selected' : ''}>Website orders</option><option value="pos" ${F.orderSrc === 'pos' ? 'selected' : ''}>Counter bills</option></select><button class="btn gold" onclick="go('billing')">+ New bill</button></div>
+  <div class="tablewrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th class="right">Total</th><th>Payment</th><th>Status</th></tr></thead><tbody id="orderRows"></tbody></table></div>`;
+  $$('[data-tab]').forEach((b) => { b.onclick = () => { F.orderTab = b.dataset.tab; $$('[data-tab]').forEach((x) => x.classList.toggle('on', x === b)); draw(); }; });
+  $('#oq').oninput = (e) => { F.orderQ = e.target.value; draw(); }; $('#osrc').onchange = (e) => { F.orderSrc = e.target.value; draw(); };
+  draw();
+};
+async function openOrder(id) {
+  const { order: o, settings: st } = await api('GET', '/admin/orders/' + id);
+  const c = o.customer; const next = NEXT[o.status];
+  const addr = [c.address, c.city, c.pincode].filter(Boolean).join(', ');
+  const msg = `Namaste ${c.name}! Your Taran Hari order ${o.number} (${inr(o.total)}) is now ${STATUS[o.status].toLowerCase()}. Thank you!`;
+  const rows = o.items.map((i) => `<tr><td><div class="pname">${imgOrBlank(i.image)}<span><b>${esc(i.name)}</b><span class="small muted">${esc(i.size)}</span></span></div></td><td class="right">${inr(i.price)}</td><td class="right">${i.qty}</td><td class="right"><b>${inr(i.lineTotal)}</b></td></tr>`).join('');
+  const body = `
+  <div class="grid2" style="gap:12px;margin-bottom:12px">
+    <div class="card" style="margin:0"><h3>Customer</h3><dl class="kv"><dt>Name</dt><dd><b>${esc(c.name)}</b></dd>${c.phone ? `<dt>Phone</dt><dd><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a> &middot; <a target="_blank" rel="noopener" href="${waLink(c.phone, msg)}">WhatsApp</a></dd>` : ''}${c.email ? `<dt>Email</dt><dd>${esc(c.email)}</dd>` : ''}${addr ? `<dt>Address</dt><dd>${esc(addr)}</dd>` : ''}${o.note ? `<dt>Note</dt><dd>${esc(o.note)}</dd>` : ''}<dt>Placed</dt><dd>${when(o.createdAt)} ${o.source === 'pos' ? '<span class="pill gold">Counter bill</span>' : ''}</dd></dl></div>
+    <div class="card" style="margin:0"><h3>Payment</h3><dl class="kv"><dt>Status</dt><dd><span class="pill ${o.payment.status === 'paid' ? 'ok' : o.payment.status === 'refund-due' ? 'err' : 'warn'}">${o.payment.status === 'paid' ? 'Paid' : o.payment.status === 'refund-due' ? 'Refund due' : 'Unpaid'}</span></dd><dt>Method</dt><dd><select class="f-sel sm" id="payMethod" style="width:auto">${['cod', 'cash', 'upi', 'card', 'online'].map((m) => `<option value="${m}" ${o.payment.method === m ? 'selected' : ''}>${PAYLBL[m]}</option>`).join('')}</select></dd></dl>
+    <div class="tools mt" style="margin-bottom:0">${o.payment.status === 'paid' ? '<button class="btn sm ghost" id="markUnpaid">Mark as unpaid</button>' : '<button class="btn sm green" id="markPaid">Mark as paid</button>'}</div></div>
+  </div>
+  <div class="tablewrap"><table style="min-width:420px"><thead><tr><th>Item</th><th class="right">Price</th><th class="right">Qty</th><th class="right">Total</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div class="totals mt"><div><span>Subtotal</span><span>${inr(o.subtotal)}</span></div>${o.offer ? `<div class="neg"><span>Offer: ${esc(o.offer.name)}</span><span>-${inr(o.offer.amount)}</span></div>` : ''}${o.coupon ? `<div class="neg"><span>Coupon ${esc(o.coupon.code)}</span><span>-${inr(o.coupon.amount)}</span></div>` : ''}${o.manualDiscount ? `<div class="neg"><span>Discount</span><span>-${inr(o.manualDiscount)}</span></div>` : ''}<div><span>Delivery</span><span>${o.delivery ? inr(o.delivery) : 'Free'}</span></div>${o.tax?.percent ? `<div class="muted small"><span>Includes GST ${o.tax.percent}%</span><span>${inr(o.tax.amount)}</span></div>` : ''}<div class="big"><span>Total</span><span>${inr(o.total)}</span></div></div>
+  <h3 class="mt mb">Progress</h3><ul class="tl">${(o.history || []).map((h) => `<li><i></i><span><b>${STATUS[h.status] || h.status}</b> <span class="muted">&middot; ${when(h.at)}${h.note ? ' &middot; ' + esc(h.note) : ''}</span></span></li>`).join('')}</ul>`;
+  const foot = `${o.status !== 'cancelled' ? `<select class="f-sel sm" id="stSel" style="width:auto">${Object.keys(STATUS).map((k) => `<option value="${k}" ${o.status === k ? 'selected' : ''}>${STATUS[k]}</option>`).join('')}</select><button class="btn ghost sm" id="stGo">Update status</button>` : ''}
+    <button class="btn ghost" id="prSlip">Print slip</button><button class="btn ghost" id="prInv">Print invoice (A4)</button>
+    ${next ? `<button class="btn green" id="stNext">${NEXT_LABEL[next]}</button>` : ''}
+    ${o.status !== 'cancelled' && o.status !== 'delivered' ? '<button class="btn danger" id="stCancel">Cancel order</button>' : ''}<button class="btn danger" id="delOrder">Delete</button>`;
+  openModal(`Order ${o.number}  ·  ${STATUS[o.status]}`, body, foot, true);
+  const refresh = () => { closeModal(); if (S.view === 'orders') VIEWS.orders(); else if (S.view === 'dashboard') VIEWS.dashboard(); pollOrders(); };
+  const upd = (payload, okMsg, btn) => act(btn, async () => { await api('PATCH', '/admin/orders/' + o.id, payload); refresh(); }, okMsg);
+  $('#prSlip').onclick = () => printBill(o, st, 'slip'); $('#prInv').onclick = () => printBill(o, st, 'a4');
+  if ($('#stGo')) $('#stGo').onclick = (e) => upd({ status: $('#stSel').value }, 'Status updated', e.currentTarget);
+  if ($('#stNext')) $('#stNext').onclick = (e) => upd({ status: next }, 'Order updated', e.currentTarget);
+  if ($('#stCancel')) $('#stCancel').onclick = async (e) => { if (await confirmBox('Cancel this order? The stock will be put back.', 'Yes, cancel order')) upd({ status: 'cancelled' }, 'Order cancelled', e.currentTarget); };
+  if ($('#markPaid')) $('#markPaid').onclick = (e) => upd({ payment: { status: 'paid', method: $('#payMethod').value } }, 'Marked as paid', e.currentTarget);
+  if ($('#markUnpaid')) $('#markUnpaid').onclick = (e) => upd({ payment: { status: 'unpaid', method: $('#payMethod').value } }, 'Marked as unpaid', e.currentTarget);
+  $('#payMethod').onchange = () => upd({ payment: { status: o.payment.status === 'paid' ? 'paid' : 'unpaid', method: $('#payMethod').value } }, 'Payment method saved');
+  $('#delOrder').onclick = async (e) => { if (await confirmBox(`Delete order ${o.number} for good?${o.status !== 'delivered' && o.status !== 'cancelled' ? ' Its stock will be put back.' : ''}`, 'Delete')) act(e.currentTarget, async () => { await api('DELETE', '/admin/orders/' + o.id); refresh(); }, 'Order deleted'); };
+}
+
+/* ================================== BILLING ================================== */
+const B = { items: [], coupon: '', mType: 'flat', mVal: '', name: '', phone: '', pay: 'cash', paid: true, quote: null, products: [], q: '', cat: 'All', picks: {} };
+VIEWS.billing = async () => {
+  const [pr, cats] = await Promise.all([api('GET', '/admin/products'), loadCats()]);
+  B.products = pr.products.filter((p) => p.active !== false);
+  $('#view').innerHTML = `${storageWarning()}<div class="pos">
+    <div><div class="tools"><input class="f-in search" id="bq" placeholder="Search products…" value="${esc(B.q)}"><select class="f-sel" id="bcat"><option>All</option>${cats.map((c) => `<option ${B.cat === c.name ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select></div><div class="pgrid" id="pgrid"></div></div>
+    <div class="card sticky" id="billPanel"></div></div>`;
+  $('#bq').oninput = (e) => { B.q = e.target.value; drawPicker(); }; $('#bcat').onchange = (e) => { B.cat = e.target.value; drawPicker(); };
+  drawPicker(); requote();
+};
+function drawPicker() {
+  const q = B.q.toLowerCase();
+  const list = B.products.filter((p) => (B.cat === 'All' || p.category === B.cat) && (!q || `${p.name} ${p.category}`.toLowerCase().includes(q)));
+  $('#pgrid').innerHTML = list.length ? list.map((p) => {
+    const sizes = p.sizes.filter((s) => s.enabled !== false); const sel = B.picks[p.id] || p.weight; const s = sizes.find((x) => x.label === sel) || sizes[0];
+    const out = p.trackStock !== false && s.stock <= 0;
+    return `<div class="pcard ${out ? 'out' : ''}">${imgOrBlank(p.image).replace('thumb', 'thumb" style="width:100%;height:auto;aspect-ratio:1/1')}<b>${esc(p.name)}</b>
+      <select class="f-sel sm" data-pick="${esc(p.id)}">${sizes.map((x) => `<option value="${esc(x.label)}" ${x.label === s.label ? 'selected' : ''}>${esc(x.label)} – ${inr(x.price)}</option>`).join('')}</select>
+      <div class="small ${out ? '' : 'muted'}">${p.trackStock === false ? 'Not tracked' : out ? '<span class="pill err">Out of stock</span>' : s.stock + ' in stock'}</div>
+      <button class="btn sm" data-add="${esc(p.id)}" ${out ? 'disabled' : ''}>Add to bill</button></div>`;
+  }).join('') : '<div class="empty" style="grid-column:1/-1"><b>No products found</b>Try a different search.</div>';
+  $$('[data-pick]').forEach((s) => { s.onchange = () => { B.picks[s.dataset.pick] = s.value; drawPicker(); }; });
+  $$('[data-add]').forEach((b) => { b.onclick = () => { const p = B.products.find((x) => x.id === b.dataset.add); const size = B.picks[p.id] || p.weight; const ex = B.items.find((i) => i.id === p.id && i.size === size); if (ex) ex.qty++; else B.items.push({ id: p.id, size, qty: 1 }); requote(); }; });
+}
+let quoteTimer; let quoteSeq = 0;
+function requote() { clearTimeout(quoteTimer); quoteTimer = setTimeout(async () => { const seq = ++quoteSeq; try { const r = await api('POST', '/admin/billing/quote', { items: B.items, coupon: B.coupon, manualDiscount: B.mVal ? { type: B.mType, value: Number(B.mVal) } : null }); if (seq === quoteSeq) { B.quote = r.quote; drawBill(); } } catch (e) { toast(e.message, 'err'); } }, 120); drawBill(); }
+function drawBill() {
+  const p = $('#billPanel'); if (!p) return; const q = B.quote;
+  const lines = q ? q.lines : [];
+  p.innerHTML = `<h3>Current bill</h3>
+  ${lines.length ? lines.map((l) => `<div class="bill-line"><div><b>${esc(l.name)}</b> <span class="small muted">${esc(l.size)}</span>${l.issue ? `<div class="small" style="color:var(--err)">${esc(l.issue)}</div>` : ''}</div><div class="right"><b>${inr(l.lineTotal)}</b></div>
+    <div class="stepper"><button class="icon-btn" data-dec="${esc(l.key)}">&minus;</button><input type="number" min="1" value="${l.qty}" data-qty="${esc(l.key)}"><button class="icon-btn" data-inc="${esc(l.key)}">+</button><span class="small muted">&times; ${inr(l.price)}</span></div><div class="right"><button class="btn sm danger" data-rm="${esc(l.key)}">Remove</button></div></div>`).join('') : '<div class="empty"><b>Bill is empty</b>Pick products on the left.</div>'}
+  <div class="row r2 mt"><div><label class="f">Customer name</label><input class="f-in sm" id="bName" value="${esc(B.name)}" placeholder="Walk-in customer"></div><div><label class="f">Phone</label><input class="f-in sm" id="bPhone" value="${esc(B.phone)}" placeholder="Optional" inputmode="tel"></div></div>
+  <div class="row r2" style="margin-bottom:8px"><div><label class="f">Coupon</label><div style="display:flex;gap:6px"><input class="f-in sm" id="bCoupon" value="${esc(B.coupon)}" placeholder="Code" style="text-transform:uppercase"><button class="btn sm ghost" id="bApply">Apply</button></div>${q?.couponError ? `<div class="hint" style="color:var(--err)">${esc(q.couponError)}</div>` : q?.coupon ? `<div class="hint neg">${esc(q.coupon.code)} applied</div>` : ''}</div>
+  <div><label class="f">Extra discount</label><div style="display:flex;gap:6px"><select class="f-sel sm" id="bmType" style="width:80px"><option value="flat" ${B.mType === 'flat' ? 'selected' : ''}>₹</option><option value="percent" ${B.mType === 'percent' ? 'selected' : ''}>%</option></select><input class="f-in sm" id="bmVal" type="number" min="0" value="${esc(B.mVal)}" placeholder="0"></div></div></div>
+  <div class="row r2" style="margin-bottom:8px"><div><label class="f">Payment</label><select class="f-sel sm" id="bPay">${['cash', 'upi', 'card'].map((m) => `<option value="${m}" ${B.pay === m ? 'selected' : ''}>${PAYLBL[m]}</option>`).join('')}</select></div><div><label class="f">Payment received</label><div class="chk" style="padding-top:6px">${sw(B.paid, 'id="bPaid"')} <span>${B.paid ? 'Paid' : 'Pay later'}</span></div></div></div>
+  ${q ? `<div class="totals"><div><span>Subtotal</span><span>${inr(q.subtotal)}</span></div>${q.offer ? `<div class="neg"><span>Offer: ${esc(q.offer.name)}</span><span>-${inr(q.offer.amount)}</span></div>` : ''}${q.coupon ? `<div class="neg"><span>Coupon ${esc(q.coupon.code)}</span><span>-${inr(q.coupon.amount)}</span></div>` : ''}${q.manualDiscount ? `<div class="neg"><span>Extra discount</span><span>-${inr(q.manualDiscount)}</span></div>` : ''}${q.tax.percent ? `<div class="muted small"><span>Includes GST ${q.tax.percent}%</span><span>${inr(q.tax.amount)}</span></div>` : ''}<div class="big"><span>Total</span><span>${inr(q.total)}</span></div></div>` : ''}
+  <button class="btn block lg mt" id="bCreate" ${lines.some((l) => l.available) ? '' : 'disabled'}>Create bill &amp; print</button>
+  <button class="btn ghost block mt" id="bClear" style="margin-top:8px">Clear bill</button>`;
+  const setQty = (key, qty) => { const it = B.items.find((i) => `${i.id}|${i.size}` === key); if (!it) return; if (qty <= 0) B.items = B.items.filter((i) => i !== it); else it.qty = Math.min(500, qty); requote(); };
+  $$('[data-inc]', p).forEach((b) => { b.onclick = () => setQty(b.dataset.inc, (B.items.find((i) => `${i.id}|${i.size}` === b.dataset.inc)?.qty || 0) + 1); });
+  $$('[data-dec]', p).forEach((b) => { b.onclick = () => setQty(b.dataset.dec, (B.items.find((i) => `${i.id}|${i.size}` === b.dataset.dec)?.qty || 0) - 1); });
+  $$('[data-rm]', p).forEach((b) => { b.onclick = () => setQty(b.dataset.rm, 0); });
+  $$('[data-qty]', p).forEach((i) => { i.onchange = () => setQty(i.dataset.qty, Math.floor(Number(i.value) || 1)); });
+  $('#bName', p).oninput = (e) => { B.name = e.target.value; }; $('#bPhone', p).oninput = (e) => { B.phone = e.target.value; };
+  $('#bApply', p).onclick = () => { B.coupon = $('#bCoupon', p).value.trim().toUpperCase(); requote(); };
+  $('#bCoupon', p).onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); $('#bApply', p).click(); } };
+  $('#bmType', p).onchange = (e) => { B.mType = e.target.value; requote(); }; $('#bmVal', p).onchange = (e) => { B.mVal = e.target.value; requote(); };
+  $('#bPay', p).onchange = (e) => { B.pay = e.target.value; }; $('#bPaid', p).onchange = (e) => { B.paid = e.target.checked; drawBill(); };
+  $('#bClear', p).onclick = () => { Object.assign(B, { items: [], coupon: '', mVal: '', name: '', phone: '', quote: null }); requote(); };
+  $('#bCreate', p).onclick = (e) => act(e.currentTarget, async () => {
+    const r = await api('POST', '/admin/billing', { items: B.items, coupon: B.coupon, manualDiscount: B.mVal ? { type: B.mType, value: Number(B.mVal) } : null, customer: { name: B.name, phone: B.phone }, payMethod: B.pay, markPaid: B.paid });
+    Object.assign(B, { items: [], coupon: '', mVal: '', name: '', phone: '', quote: null });
+    const o = r.order; const st = r.settings;
+    openModal('Bill created', `<div style="text-align:center;padding:10px 0"><div class="logo-mark" style="background:var(--ok);color:#fff">&#10003;</div><h2 style="margin:8px 0 4px">${esc(o.number)}</h2><p class="muted" style="margin:0">${inr(o.total)} &middot; ${o.payment.status === 'paid' ? 'Paid by ' + PAYLBL[o.payment.method] : 'Payment due'}</p></div>`,
+      '<button class="btn ghost" id="nbSlip">Print slip</button><button class="btn ghost" id="nbInv">Print invoice (A4)</button><button class="btn" id="nbNew">New bill</button>');
+    printBill(o, st, 'slip');
+    $('#nbSlip').onclick = () => printBill(o, st, 'slip'); $('#nbInv').onclick = () => printBill(o, st, 'a4'); $('#nbNew').onclick = () => { closeModal(); VIEWS.billing(); };
+  }, null);
+}
+
+/* ================================== PRODUCTS ================================== */
+F.pq = ''; F.pcat = ''; F.pstat = '';
+VIEWS.products = async () => {
+  const [pr, cats] = await Promise.all([api('GET', '/admin/products'), loadCats()]);
+  let all = pr.products;
+  const sizeSummary = (p) => p.sizes.map((s) => `<div class="small nowrap ${s.enabled === false ? 'muted' : ''}">${esc(s.label)} &middot; ${inr(s.price)}${s.mrp > s.price ? ` <s class="muted">${inr(s.mrp)}</s>` : ''} &middot; <b>${p.trackStock === false ? '∞' : s.stock}</b>${s.enabled === false ? ' (hidden)' : ''}</div>`).join('');
+  const draw = () => {
+    const q = F.pq.toLowerCase();
+    const list = all.filter((p) => (!F.pcat || String(p.categoryId) === F.pcat) && (!q || `${p.name} ${p.category} ${(p.tags || []).join(' ')}`.toLowerCase().includes(q))
+      && (!F.pstat || (F.pstat === 'hidden' ? p.active === false : F.pstat === 'active' ? p.active !== false : p.stockStatus === F.pstat)));
+    $('#prodRows').innerHTML = list.length ? list.map((p) => `<tr><td><div class="pname">${imgOrBlank(p.image)}<span><b>${esc(p.name)}</b><span class="small muted">${esc(p.category)} ${p.veg === false ? '&bull; Non-veg' : ''}</span></span></div></td>
+      <td>${sizeSummary(p)}</td><td>${p.stockStatus === 'out' ? '<span class="pill err">Out of stock</span>' : p.stockStatus === 'low' ? '<span class="pill warn">Low stock</span>' : '<span class="pill ok">In stock</span>'}</td>
+      <td>${sw(p.active !== false, `data-vis="${esc(p.id)}"`)}</td><td>${sw(!!p.trending, `data-trend="${esc(p.id)}"`)}</td>
+      <td class="nowrap"><button class="btn sm ghost" data-edit="${esc(p.id)}">Edit</button> <button class="btn sm ghost" data-dup="${esc(p.id)}">Copy</button> <button class="btn sm danger" data-del="${esc(p.id)}">Delete</button></td></tr>`).join('')
+      : '<tr><td colspan="6"><div class="empty"><b>No products found</b>Change the filters or add a new product.</div></td></tr>';
+    $$('[data-edit]').forEach((b) => { b.onclick = () => productModal(all.find((x) => x.id === b.dataset.edit), cats, reload); });
+    $$('[data-dup]').forEach((b) => { b.onclick = () => act(b, async () => { await api('POST', `/admin/products/${b.dataset.dup}/duplicate`); reload(); }, 'Copied (hidden until you publish it)'); });
+    $$('[data-del]').forEach((b) => { b.onclick = async () => { const p = all.find((x) => x.id === b.dataset.del); if (await confirmBox(`Delete "${p.name}" for good?`, 'Delete')) act(b, async () => { await api('DELETE', '/admin/products/' + p.id); reload(); }, 'Product deleted'); }; });
+    $$('[data-vis]').forEach((i) => { i.onchange = () => act(null, () => api('PATCH', '/admin/products/' + i.dataset.vis, { active: i.checked }), i.checked ? 'Now visible on website' : 'Hidden from website'); });
+    $$('[data-trend]').forEach((i) => { i.onchange = () => act(null, () => api('PATCH', '/admin/products/' + i.dataset.trend, { trending: i.checked }), 'Saved'); });
+  };
+  const reload = () => VIEWS.products();
+  $('#view').innerHTML = `${storageWarning()}<div class="tools"><input class="f-in search" id="pq" placeholder="Search products…" value="${esc(F.pq)}">
+    <select class="f-sel" id="pcat"><option value="">All categories</option>${cats.map((c) => `<option value="${c.id}" ${F.pcat === String(c.id) ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>
+    <select class="f-sel" id="pstat"><option value="">All status</option>${[['active', 'Visible'], ['hidden', 'Hidden'], ['low', 'Low stock'], ['out', 'Out of stock']].map(([v, l]) => `<option value="${v}" ${F.pstat === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+    <button class="btn" id="pnew">+ Add product</button></div>
+  <div class="tablewrap"><table><thead><tr><th>Product</th><th>Pack sizes &middot; price &middot; stock</th><th>Stock</th><th>Visible</th><th>Trending</th><th></th></tr></thead><tbody id="prodRows"></tbody></table></div>
+  <p class="hint">${all.length} products. Changes show on the website within a few seconds.</p>`;
+  $('#pq').oninput = (e) => { F.pq = e.target.value; draw(); }; $('#pcat').onchange = (e) => { F.pcat = e.target.value; draw(); }; $('#pstat').onchange = (e) => { F.pstat = e.target.value; draw(); };
+  $('#pnew').onclick = () => { if (!cats.length) { toast('Create a category first', 'err'); go('categories'); return; } productModal(null, cats, reload); };
+  draw();
+};
+const sizeRow = (s = {}) => `<div class="size-row" data-size><input class="f-in sm" data-f="label" value="${esc(s.label ?? '')}" placeholder="200 g"><input class="f-in sm" data-f="price" type="number" min="0" step="0.5" value="${esc(s.price ?? '')}" placeholder="Price ₹"><input class="f-in sm" data-f="mrp" type="number" min="0" step="0.5" value="${esc(s.mrp ?? '')}" placeholder="MRP ₹"><input class="f-in sm" data-f="stock" type="number" min="0" value="${esc(s.stock ?? 50)}" placeholder="Stock"><span title="Show this size on the website">${sw(s.enabled !== false, 'data-f="enabled"')}</span><button type="button" class="icon-btn" data-rmsize title="Remove size">&times;</button></div>`;
+function productModal(p, cats, done) {
+  const isNew = !p; p = p || { sizes: [{ label: '200 g', stock: 50, enabled: true }], veg: true, active: true, trackStock: true, lowStockAt: 10, rating: 4.5, reviews: 0, spice: 'Mild', tags: [] };
+  const body = `<div class="row r2">${fld('Product name', `<input class="f-in" id="pName" value="${esc(p.name || '')}" placeholder="e.g. Aloo Bhujia">`)}${fld('Category', `<select class="f-sel" id="pCat">${cats.map((c) => `<option value="${c.id}" ${p.categoryId === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>`)}</div>
+  ${imageField('image', 'Product photo', p.image, 'id="pImg"')}<div style="height:14px"></div>
+  ${fld('Description', `<textarea class="f-ta" id="pDesc" placeholder="A short, tasty description">${esc(p.description || '')}</textarea>`)}
+  <h4 class="mt mb">Pack sizes, prices &amp; stock</h4>
+  <div class="size-row size-head"><span>Size</span><span>Price ₹</span><span>MRP ₹</span><span>Stock</span><span>Show</span><span></span></div>
+  <div id="sizes">${p.sizes.map(sizeRow).join('')}</div>
+  <button type="button" class="btn sm ghost" id="addSize">+ Add pack size</button>
+  <div class="hint">Price is what the customer pays. MRP is the crossed-out price (use the same number for no discount).</div>
+  <div class="row mt">${fld('Default size on website', '<select class="f-sel" id="pWeight"></select>')}${fld('Spice level', `<select class="f-sel" id="pSpice">${['Mild', 'Medium', 'Hot'].map((s) => `<option ${p.spice === s ? 'selected' : ''}>${s}</option>`).join('')}</select>`)}${fld('Low-stock alert at', `<input class="f-in" id="pLow" type="number" min="0" value="${esc(p.lowStockAt ?? 10)}">`, 'Warn me when a size has this many left')}</div>
+  <div class="row">${fld('Rating (0-5)', `<input class="f-in" id="pRate" type="number" min="0" max="5" step="0.1" value="${esc(p.rating ?? 4.5)}">`)}${fld('Number of reviews', `<input class="f-in" id="pRev" type="number" min="0" value="${esc(p.reviews ?? 0)}">`)}${fld('Search tags', `<input class="f-in" id="pTags" value="${esc((p.tags || []).join(', '))}" placeholder="crispy, tea time">`, 'Separate with commas')}</div>
+  <div class="row"><label class="chk">${sw(p.veg !== false, 'id="pVeg"')} Vegetarian</label><label class="chk">${sw(!!p.trending, 'id="pTrend"')} Trending</label><label class="chk">${sw(p.active !== false, 'id="pActive"')} Visible on website</label><label class="chk">${sw(p.trackStock !== false, 'id="pTrack"')} Track stock</label></div>`;
+  openModal(isNew ? 'Add product' : 'Edit product', body, `<button class="btn ghost" data-close>Cancel</button><button class="btn green" id="pSave">${isNew ? 'Add product' : 'Save changes'}</button>`, true);
+  const fillWeights = () => { const labels = $$('[data-size]').map((r) => $('[data-f=label]', r).value.trim()).filter(Boolean); const cur = $('#pWeight').value || p.weight; $('#pWeight').innerHTML = labels.map((l) => `<option ${l === cur ? 'selected' : ''}>${esc(l)}</option>`).join(''); };
+  fillWeights();
+  $('#sizes').addEventListener('input', fillWeights);
+  $('#sizes').addEventListener('click', (e) => { const b = e.target.closest('[data-rmsize]'); if (b) { if ($$('[data-size]').length > 1) { b.closest('[data-size]').remove(); fillWeights(); } else toast('A product needs at least one size', 'err'); } });
+  $('#addSize').onclick = () => { $('#sizes').insertAdjacentHTML('beforeend', sizeRow({ label: '', stock: 50 })); };
+  $('#pSave').onclick = (e) => act(e.currentTarget, async () => {
+    const sizes = $$('[data-size]').map((r) => ({ label: $('[data-f=label]', r).value.trim(), price: $('[data-f=price]', r).value, mrp: $('[data-f=mrp]', r).value, stock: $('[data-f=stock]', r).value, enabled: $('[data-f=enabled]', r).checked }));
+    const payload = { name: $('#pName').value, categoryId: Number($('#pCat').value), image: $('#pImg').value, description: $('#pDesc').value, sizes, weight: $('#pWeight').value, spice: $('#pSpice').value, lowStockAt: $('#pLow').value, rating: $('#pRate').value, reviews: $('#pRev').value, tags: $('#pTags').value, veg: $('#pVeg').checked, trending: $('#pTrend').checked, active: $('#pActive').checked, trackStock: $('#pTrack').checked };
+    if (isNew) await api('POST', '/admin/products', payload); else await api('PUT', '/admin/products/' + p.id, payload);
+    closeModal(); done();
+  }, isNew ? 'Product added' : 'Product saved');
+}
+
+/* =================================== STOCK =================================== */
+F.sq = ''; F.sstat = 'all'; F.scat = ''; F.stab = 'levels';
+VIEWS.stock = async () => {
+  if (F.stab === 'history') return stockHistory();
+  const r = await api('GET', '/admin/stock'); let rows = r.rows.filter((x) => x.enabled);
+  const cats = [...new Set(rows.map((x) => x.category))];
+  const draw = () => {
+    const q = F.sq.toLowerCase();
+    const list = rows.filter((x) => (F.sstat === 'all' || x.status === F.sstat) && (!F.scat || x.category === F.scat) && (!q || `${x.name} ${x.category}`.toLowerCase().includes(q)));
+    $('#stockRows').innerHTML = list.length ? list.map((x) => `<tr data-row="${esc(x.productId)}|${esc(x.size)}"><td><div class="pname">${imgOrBlank(x.image)}<span><b>${esc(x.name)}</b><span class="small muted">${esc(x.category)}${x.active ? '' : ' &bull; hidden'}</span></span></div></td><td><b>${esc(x.size)}</b></td>
+      <td>${x.status === 'untracked' ? '<span class="pill">Not tracked</span>' : x.status === 'out' ? '<span class="pill err">Out of stock</span>' : x.status === 'low' ? '<span class="pill warn">Low</span>' : '<span class="pill ok">OK</span>'}</td>
+      <td><div class="stepper"><button class="icon-btn" data-d="-10" title="-10">&minus;10</button><button class="icon-btn" data-d="-1">&minus;</button><input type="number" min="0" value="${x.stock}" data-set ${x.tracked ? '' : 'disabled'}><button class="icon-btn" data-d="1">+</button><button class="icon-btn" data-d="10" title="+10">+10</button></div></td><td class="right muted">${inr(x.value)}</td></tr>`).join('')
+      : '<tr><td colspan="5"><div class="empty"><b>Nothing here</b>Try another filter.</div></td></tr>';
+    $$('#stockRows tr[data-row]').forEach((tr) => {
+      const [pid, size] = tr.dataset.row.split('|'); const row = rows.find((x) => x.productId === pid && x.size === size);
+      const apply = (promise) => act(null, async () => { const res = await promise; row.stock = res.stock; row.value = row.stock * row.price; row.status = row.stock <= 0 ? 'out' : row.stock <= row.lowStockAt ? 'low' : 'ok'; draw(); sum(); refreshStockBadge(); }, 'Stock updated');
+      $$('[data-d]', tr).forEach((b) => { b.onclick = () => apply(api('POST', '/admin/stock/adjust', { productId: pid, size, delta: Number(b.dataset.d), reason: 'Quick adjust' })); });
+      const inp = $('[data-set]', tr); inp.onchange = () => apply(api('POST', '/admin/stock/adjust', { productId: pid, size, set: Math.max(0, Math.floor(Number(inp.value) || 0)), reason: 'Stock count updated' }));
+    });
+  };
+  const sum = () => { const live = rows.filter((x) => x.tracked && x.active); $('#sUnits').textContent = live.reduce((n, x) => n + x.stock, 0).toLocaleString('en-IN'); $('#sVal').textContent = inr(live.reduce((n, x) => n + x.value, 0)); $('#sOut').textContent = rows.filter((x) => x.status === 'out' && x.active).length; $('#sLow').textContent = rows.filter((x) => x.status === 'low' && x.active).length; };
+  $('#view').innerHTML = `${storageWarning()}<div class="stats"><div class="stat"><div class="lbl">Units in stock</div><div class="val" id="sUnits"></div></div><div class="stat gold"><div class="lbl">Stock value (at selling price)</div><div class="val" id="sVal"></div></div><div class="stat red"><div class="lbl">Out of stock</div><div class="val" id="sOut"></div></div><div class="stat"><div class="lbl">Running low</div><div class="val" id="sLow"></div></div></div>
+  <div class="tabs"><button class="tab on" data-st="levels">Stock levels</button><button class="tab" data-st="history">History</button></div>
+  <div class="tools"><input class="f-in search" id="sq" placeholder="Search products…" value="${esc(F.sq)}"><select class="f-sel" id="scat"><option value="">All categories</option>${cats.map((c) => `<option ${F.scat === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>
+  <select class="f-sel" id="sstat">${[['all', 'All'], ['low', 'Running low'], ['out', 'Out of stock'], ['ok', 'In stock']].map(([v, l]) => `<option value="${v}" ${F.sstat === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+  <div class="tablewrap"><table><thead><tr><th>Product</th><th>Pack size</th><th>Status</th><th>Stock (tap to change)</th><th class="right">Value</th></tr></thead><tbody id="stockRows"></tbody></table></div>
+  <p class="hint">Stock goes down automatically when a customer orders or you make a counter bill, and comes back if you cancel an order. Sizes at 0 show as "Out of stock" on the website.</p>`;
+  $$('[data-st]').forEach((b) => { b.onclick = () => { F.stab = b.dataset.st; VIEWS.stock(); }; });
+  $('#sq').oninput = (e) => { F.sq = e.target.value; draw(); }; $('#scat').onchange = (e) => { F.scat = e.target.value; draw(); }; $('#sstat').onchange = (e) => { F.sstat = e.target.value; draw(); };
+  sum(); draw();
+};
+async function stockHistory() {
+  const r = await api('GET', '/admin/stock/log?limit=200');
+  $('#view').innerHTML = `<div class="tabs"><button class="tab" data-st="levels">Stock levels</button><button class="tab on" data-st="history">History</button></div>
+  <div class="tablewrap"><table><thead><tr><th>When</th><th>Product</th><th>Size</th><th>Change</th><th>New stock</th><th>Reason</th></tr></thead><tbody>${r.log.length ? r.log.map((e) => `<tr><td class="nowrap">${when(e.ts)}</td><td><b>${esc(e.name)}</b></td><td>${esc(e.size)}</td><td><span class="pill ${e.delta < 0 ? 'err' : 'ok'}">${e.delta > 0 ? '+' : ''}${e.delta}</span></td><td>${e.after}</td><td class="small">${esc(e.reason || '')}${e.order ? ` &middot; ${esc(e.order)}` : ''}</td></tr>`).join('') : '<tr><td colspan="6"><div class="empty"><b>No stock changes yet</b></div></td></tr>'}</tbody></table></div>`;
+  $$('[data-st]').forEach((b) => { b.onclick = () => { F.stab = b.dataset.st; VIEWS.stock(); }; });
+}
+
+/* ================================= CATEGORIES ================================= */
+const TONES = { brand: 'Red', accent: 'Yellow', ink: 'Dark brown', white: 'White' };
+VIEWS.categories = async () => {
+  const cats = await loadCats();
+  $('#view').innerHTML = `${storageWarning()}<div class="tools"><span class="muted grow">These are the 4 collection tiles on your Home and Shop pages. Use the arrows to change their order.</span><button class="btn" id="cNew">+ Add category</button></div>
+  <div class="grid3">${cats.map((c, i) => `<div class="card" style="padding:0;overflow:hidden;margin:0;${c.active === false ? 'opacity:.6' : ''}"><div style="height:140px;background:var(--cream) center/cover no-repeat url('${esc(c.image)}')"></div><div style="padding:14px"><div class="card-h" style="margin-bottom:4px"><b class="grow" style="font-size:16px">${esc(c.name)}</b><span class="pill ${c.active === false ? '' : 'ok'}">${c.active === false ? 'Hidden' : 'Visible'}</span></div><div class="small muted">${esc(c.note || 'No tagline')}</div><div class="small mt">${c.productCount} product${c.productCount === 1 ? '' : 's'} &middot; colour: ${TONES[c.tone] || 'Red'}</div>
+  <div class="tools mt" style="margin:12px 0 0"><button class="icon-btn" data-up="${c.id}" ${i === 0 ? 'disabled' : ''} title="Move up">&uarr;</button><button class="icon-btn" data-dn="${c.id}" ${i === cats.length - 1 ? 'disabled' : ''} title="Move down">&darr;</button><span class="grow"></span><button class="btn sm ghost" data-edit="${c.id}">Edit</button><button class="btn sm danger" data-del="${c.id}">Delete</button></div></div></div>`).join('')}</div>
+  ${cats.length ? '' : '<div class="empty"><b>No categories yet</b>Add your first one.</div>'}`;
+  $('#cNew').onclick = () => catModal(null);
+  $$('[data-edit]').forEach((b) => { b.onclick = () => catModal(cats.find((c) => String(c.id) === b.dataset.edit)); });
+  $$('[data-del]').forEach((b) => { b.onclick = async () => { const c = cats.find((x) => String(x.id) === b.dataset.del); if (await confirmBox(`Delete the "${c.name}" category?`, 'Delete')) act(b, async () => { await api('DELETE', '/admin/categories/' + c.id); VIEWS.categories(); }, 'Category deleted'); }; });
+  const move = (id, dir) => act(null, async () => { const i = cats.findIndex((c) => String(c.id) === id); const j = i + dir; if (j < 0 || j >= cats.length) return; const a = cats[i]; const b2 = cats[j]; await api('PUT', '/admin/categories/' + a.id, { ...a, sortOrder: j + 1 }); await api('PUT', '/admin/categories/' + b2.id, { ...b2, sortOrder: i + 1 }); VIEWS.categories(); });
+  $$('[data-up]').forEach((b) => { b.onclick = () => move(b.dataset.up, -1); }); $$('[data-dn]').forEach((b) => { b.onclick = () => move(b.dataset.dn, 1); });
+};
+function catModal(c) {
+  const isNew = !c; c = c || { active: true, tone: 'brand' };
+  openModal(isNew ? 'Add category' : 'Edit category', `<div class="row r2">${fld('Name', `<input class="f-in" id="cName" value="${esc(c.name || '')}" placeholder="e.g. Namkeen">`)}${fld('Short tagline', `<input class="f-in" id="cNote" value="${esc(c.note || '')}" placeholder="e.g. Bhujia, mixes & dalmoth">`)}</div>
+  ${imageField('image', 'Category picture', c.image, 'id="cImg"')}<div style="height:14px"></div>
+  <div class="row r2">${fld('Tile colour', `<select class="f-sel" id="cTone">${Object.entries(TONES).map(([k, v]) => `<option value="${k}" ${c.tone === k ? 'selected' : ''}>${v}</option>`).join('')}</select>`, 'Colour of the tile on the website')}<label class="chk" style="padding-top:22px">${sw(c.active !== false, 'id="cActive"')} Visible on website</label></div>`,
+  `<button class="btn ghost" data-close>Cancel</button><button class="btn green" id="cSave">${isNew ? 'Add category' : 'Save changes'}</button>`);
+  $('#cSave').onclick = (e) => act(e.currentTarget, async () => { const p = { name: $('#cName').value, note: $('#cNote').value, image: $('#cImg').value, tone: $('#cTone').value, active: $('#cActive').checked }; if (isNew) await api('POST', '/admin/categories', p); else await api('PUT', '/admin/categories/' + c.id, p); closeModal(); VIEWS.categories(); }, 'Saved');
+}
+
+/* ================================== COUPONS ================================== */
+VIEWS.coupons = async () => {
+  const { coupons } = await api('GET', '/admin/coupons');
+  const valid = (c) => c.active !== false && (!c.endsAt || c.endsAt >= new Date().toISOString().slice(0, 10)) && !(c.usageLimit && c.used >= c.usageLimit);
+  $('#view').innerHTML = `${storageWarning()}<div class="tools"><span class="muted grow">Customers type these codes in their cart. You can also use them on counter bills.</span><button class="btn" id="kNew">+ New coupon</button></div>
+  <div class="tablewrap"><table><thead><tr><th>Code</th><th>Discount</th><th>Rules</th><th>Used</th><th>Valid</th><th>Active</th><th></th></tr></thead><tbody>${coupons.length ? coupons.map((c) => `<tr><td><b style="letter-spacing:.04em">${esc(c.code)}</b><div class="small muted">${esc(c.description || '')}</div></td><td><b>${c.type === 'percent' ? c.value + '%' : inr(c.value)}</b>${c.type === 'percent' && c.maxDiscount ? `<div class="small muted">up to ${inr(c.maxDiscount)}</div>` : ''}</td><td class="small">${c.minOrder ? `Min order ${inr(c.minOrder)}` : 'No minimum'}</td><td>${c.used}${c.usageLimit ? ` / ${c.usageLimit}` : ''}</td><td class="small">${c.startsAt || c.endsAt ? `${c.startsAt || 'now'} &rarr; ${c.endsAt || 'no end'}` : 'Always'} ${valid(c) ? '' : '<span class="pill err">Not usable</span>'}</td><td>${sw(c.active !== false, `data-act="${esc(c.code)}"`)}</td><td class="nowrap"><button class="btn sm ghost" data-edit="${esc(c.code)}">Edit</button> <button class="btn sm danger" data-del="${esc(c.code)}">Delete</button></td></tr>`).join('') : '<tr><td colspan="7"><div class="empty"><b>No coupons yet</b>Create one to offer discounts.</div></td></tr>'}</tbody></table></div>`;
+  $('#kNew').onclick = () => couponModal(null);
+  $$('[data-edit]').forEach((b) => { b.onclick = () => couponModal(coupons.find((c) => c.code === b.dataset.edit)); });
+  $$('[data-del]').forEach((b) => { b.onclick = async () => { if (await confirmBox(`Delete coupon ${b.dataset.del}?`, 'Delete')) act(b, async () => { await api('DELETE', '/admin/coupons/' + b.dataset.del); VIEWS.coupons(); }, 'Coupon deleted'); }; });
+  $$('[data-act]').forEach((i) => { i.onchange = () => { const c = coupons.find((x) => x.code === i.dataset.act); act(null, async () => { await api('PUT', '/admin/coupons/' + c.code, { ...c, active: i.checked }); }, i.checked ? 'Coupon turned on' : 'Coupon turned off'); }; });
+};
+function couponModal(c) {
+  const isNew = !c; c = c || { type: 'percent', active: true };
+  openModal(isNew ? 'New coupon' : `Edit ${c.code}`, `<div class="row r2">${fld('Coupon code', `<input class="f-in" id="kCode" value="${esc(c.code || '')}" ${isNew ? '' : 'disabled'} placeholder="DIWALI20" style="text-transform:uppercase">`, 'Letters and numbers only')}${fld('Short description', `<input class="f-in" id="kDesc" value="${esc(c.description || '')}" placeholder="20% off festive orders">`)}</div>
+  <div class="row">${fld('Discount type', `<select class="f-sel" id="kType"><option value="percent" ${c.type === 'percent' ? 'selected' : ''}>Percentage (%)</option><option value="flat" ${c.type === 'flat' ? 'selected' : ''}>Flat amount (₹)</option></select>`)}${fld('Discount value', `<input class="f-in" id="kVal" type="number" min="0" step="0.5" value="${esc(c.value ?? '')}">`)}${fld('Maximum discount ₹', `<input class="f-in" id="kMax" type="number" min="0" value="${esc(c.maxDiscount || '')}" placeholder="No limit">`, 'For % coupons')}</div>
+  <div class="row">${fld('Minimum order ₹', `<input class="f-in" id="kMin" type="number" min="0" value="${esc(c.minOrder || '')}" placeholder="None">`)}${fld('Total uses allowed', `<input class="f-in" id="kLim" type="number" min="0" value="${esc(c.usageLimit || '')}" placeholder="Unlimited">`)}</div>
+  <div class="row">${fld('Starts on', `<input class="f-in" id="kFrom" type="date" value="${esc(c.startsAt || '')}">`)}${fld('Ends on', `<input class="f-in" id="kTo" type="date" value="${esc(c.endsAt || '')}">`)}<label class="chk" style="padding-top:22px">${sw(c.active !== false, 'id="kActive"')} Active</label></div>`,
+  `<button class="btn ghost" data-close>Cancel</button><button class="btn green" id="kSave">${isNew ? 'Create coupon' : 'Save changes'}</button>`);
+  $('#kSave').onclick = (e) => act(e.currentTarget, async () => { const p = { code: $('#kCode').value, description: $('#kDesc').value, type: $('#kType').value, value: $('#kVal').value, maxDiscount: $('#kMax').value, minOrder: $('#kMin').value, usageLimit: $('#kLim').value, startsAt: $('#kFrom').value, endsAt: $('#kTo').value, active: $('#kActive').checked }; if (isNew) await api('POST', '/admin/coupons', p); else await api('PUT', '/admin/coupons/' + c.code, p); closeModal(); VIEWS.coupons(); }, 'Coupon saved');
+}
+
+/* ============================== OFFERS & SALES ============================== */
+VIEWS.offers = async () => {
+  const [{ offers }, cats] = await Promise.all([api('GET', '/admin/offers'), loadCats()]);
+  const cname = (id) => cats.find((c) => c.id === id)?.name || 'All products';
+  $('#view').innerHTML = `${storageWarning()}
+  <div class="card"><h3>Run a sale on your products</h3><p class="muted" style="margin-top:-6px">Lowers the selling price of many products at once (new price = MRP minus the percent). Ending the sale puts the earlier prices back.</p>
+    <div class="row">${fld('Apply to', `<select class="f-sel" id="sCat"><option value="">All products</option>${cats.map((c) => `<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select>`)}${fld('Discount %', '<input class="f-in" id="sPct" type="number" min="1" max="90" placeholder="e.g. 20">')}<div style="align-self:end;display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sGo">Start sale</button><button class="btn ghost" id="sEnd">End sale</button></div></div></div>
+  <div class="tools"><span class="muted grow"><b>Automatic offers</b> are applied in the cart on their own, with no code needed (for example "10% off orders above ₹999").</span><button class="btn" id="oNew">+ New offer</button></div>
+  <div class="tablewrap"><table><thead><tr><th>Offer</th><th>Discount</th><th>Applies to</th><th>Rules</th><th>Valid</th><th>Active</th><th></th></tr></thead><tbody>${offers.length ? offers.map((o) => `<tr><td><b>${esc(o.name)}</b></td><td><b>${o.type === 'percent' ? o.value + '%' : inr(o.value)}</b>${o.type === 'percent' && o.maxDiscount ? `<div class="small muted">up to ${inr(o.maxDiscount)}</div>` : ''}</td><td>${esc(cname(o.categoryId))}</td><td class="small">${o.minOrder ? `Min order ${inr(o.minOrder)}` : 'No minimum'}</td><td class="small">${o.startsAt || o.endsAt ? `${o.startsAt || 'now'} &rarr; ${o.endsAt || 'no end'}` : 'Always'}</td><td>${sw(o.active !== false, `data-act="${o.id}"`)}</td><td class="nowrap"><button class="btn sm ghost" data-edit="${o.id}">Edit</button> <button class="btn sm danger" data-del="${o.id}">Delete</button></td></tr>`).join('') : '<tr><td colspan="7"><div class="empty"><b>No automatic offers</b>Create one to reward bigger baskets.</div></td></tr>'}</tbody></table></div>`;
+  const sale = (pct, msg) => async (e) => { const label = $('#sCat').selectedOptions[0].textContent; if (await confirmBox(pct ? `Start a ${pct}% sale on: ${label}?` : `End the sale on: ${label} and restore the earlier prices?`, pct ? 'Start sale' : 'End sale', false)) act(e.target, () => api('POST', '/admin/products/bulk-discount', { categoryId: $('#sCat').value || 0, percent: pct }).then((r) => toast(`${r.updated} products updated`, 'ok')), null); };
+  $('#sGo').onclick = (e) => { const p = Number($('#sPct').value); if (!(p >= 1 && p <= 90)) return toast('Enter a discount between 1 and 90', 'err'); sale(p)(e); };
+  $('#sEnd').onclick = (e) => sale(0)(e);
+  $('#oNew').onclick = () => offerModal(null, cats);
+  $$('[data-edit]').forEach((b) => { b.onclick = () => offerModal(offers.find((o) => String(o.id) === b.dataset.edit), cats); });
+  $$('[data-del]').forEach((b) => { b.onclick = async () => { if (await confirmBox('Delete this offer?', 'Delete')) act(b, async () => { await api('DELETE', '/admin/offers/' + b.dataset.del); VIEWS.offers(); }, 'Offer deleted'); }; });
+  $$('[data-act]').forEach((i) => { i.onchange = () => { const o = offers.find((x) => String(x.id) === i.dataset.act); act(null, () => api('PUT', '/admin/offers/' + o.id, { ...o, active: i.checked }), i.checked ? 'Offer turned on' : 'Offer turned off'); }; });
+};
+function offerModal(o, cats) {
+  const isNew = !o; o = o || { type: 'percent', active: true };
+  openModal(isNew ? 'New offer' : 'Edit offer', `${fld('Offer name', `<input class="f-in" id="oName" value="${esc(o.name || '')}" placeholder="e.g. Festive saving">`, 'Shown to customers in their cart')}<div style="height:12px"></div>
+  <div class="row">${fld('Type', `<select class="f-sel" id="oType"><option value="percent" ${o.type === 'percent' ? 'selected' : ''}>Percentage (%)</option><option value="flat" ${o.type === 'flat' ? 'selected' : ''}>Flat amount (₹)</option></select>`)}${fld('Value', `<input class="f-in" id="oVal" type="number" min="0" step="0.5" value="${esc(o.value ?? '')}">`)}${fld('Maximum discount ₹', `<input class="f-in" id="oMax" type="number" min="0" value="${esc(o.maxDiscount || '')}" placeholder="No limit">`)}</div>
+  <div class="row">${fld('Minimum order ₹', `<input class="f-in" id="oMin" type="number" min="0" value="${esc(o.minOrder || '')}" placeholder="None">`)}${fld('Applies to', `<select class="f-sel" id="oCat"><option value="0">All products</option>${cats.map((c) => `<option value="${c.id}" ${o.categoryId === c.id ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>`)}</div>
+  <div class="row">${fld('Starts on', `<input class="f-in" id="oFrom" type="date" value="${esc(o.startsAt || '')}">`)}${fld('Ends on', `<input class="f-in" id="oTo" type="date" value="${esc(o.endsAt || '')}">`)}<label class="chk" style="padding-top:22px">${sw(o.active !== false, 'id="oActive"')} Active</label></div>`,
+  `<button class="btn ghost" data-close>Cancel</button><button class="btn green" id="oSave">${isNew ? 'Create offer' : 'Save changes'}</button>`);
+  $('#oSave').onclick = (e) => act(e.currentTarget, async () => { const p = { name: $('#oName').value, type: $('#oType').value, value: $('#oVal').value, maxDiscount: $('#oMax').value, minOrder: $('#oMin').value, categoryId: $('#oCat').value, startsAt: $('#oFrom').value, endsAt: $('#oTo').value, active: $('#oActive').checked }; if (isNew) await api('POST', '/admin/offers', p); else await api('PUT', '/admin/offers/' + o.id, p); closeModal(); VIEWS.offers(); }, 'Offer saved');
+}
+
+/* ================================== CUSTOMERS ================================== */
+VIEWS.customers = async () => {
+  const { customers } = await api('GET', '/admin/customers'); F.cq = F.cq || '';
+  const draw = () => { const q = F.cq.toLowerCase(); const l = customers.filter((c) => !q || `${c.name} ${c.phone}`.toLowerCase().includes(q)); $('#custRows').innerHTML = l.length ? l.map((c) => `<tr><td><b>${esc(c.name)}</b><div class="small muted">${esc(c.address || '')}</div></td><td><a href="tel:${esc(c.phone)}">${esc(c.phone)}</a></td><td>${c.orders}</td><td class="right"><b>${inr(c.spent)}</b></td><td class="small">${dateOnly(c.last)}</td><td><a class="btn sm ghost" target="_blank" rel="noopener" href="${waLink(c.phone, `Namaste ${c.name}! `)}">WhatsApp</a></td></tr>`).join('') : '<tr><td colspan="6"><div class="empty"><b>No customers yet</b>Customers appear here after their first order.</div></td></tr>'; };
+  $('#view').innerHTML = `<div class="tools"><input class="f-in search" id="cq" placeholder="Search name or phone…" value="${esc(F.cq)}"><span class="muted">${customers.length} customers</span></div><div class="tablewrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Orders</th><th class="right">Total spent</th><th>Last order</th><th></th></tr></thead><tbody id="custRows"></tbody></table></div>`;
+  $('#cq').oninput = (e) => { F.cq = e.target.value; draw(); }; draw();
+};
+
+/* ============================ WEBSITE PAGE EDITORS ============================ */
+const D = {}; // working copy of the page being edited
+const LISTS = {
+  home: [
+    { key: 'banners', title: 'Banner slideshow', help: 'Big pictures that slide automatically near the top of the Home page. Add or remove as many as you like.', item: 'Banner', fields: [['src', 'Picture', 'image'], ['alt', 'Short description', 'text']], blank: { src: '', alt: '' } },
+    { key: 'blocks', title: 'Picture gallery (small blocks)', help: 'The gallery of snack pictures with a title and a little tag.', item: 'Picture', fields: [['src', 'Picture', 'image'], ['title', 'Title', 'text'], ['tag', 'Tag (e.g. Bestseller)', 'text']], blank: { src: '', title: '', tag: '' } },
+    { key: 'videos', title: 'Showcase videos', help: 'Videos shown in the video section. Paste a direct video link (.mp4). Large videos cannot be uploaded here.', item: 'Video', fields: [['src', 'Video link (.mp4)', 'text'], ['title', 'Title', 'text'], ['desc', 'Description', 'area']], blank: { src: '', title: '', desc: '' } },
+    { key: 'marquee', title: 'Scrolling strip words', help: 'The words that scroll across the coloured strip.', item: 'Word', strings: true, blank: '' },
+    { key: 'aboutText', title: 'About us paragraphs', help: 'The story text in the About section.', item: 'Paragraph', strings: true, area: true, blank: '' },
+    { key: 'team', title: 'Team / owners', help: 'People shown in the About section (founder, director, co-founder…).', item: 'Person', fields: [['photo', 'Photo', 'image'], ['name', 'Name', 'text'], ['role', 'Role', 'text'], ['text', 'About them', 'area']], blank: { photo: '', name: '', role: '', text: '' } },
+    { key: 'reviews', title: 'Customer reviews', help: 'Reviews shown in the slider at the bottom of the Home page.', item: 'Review', fields: [['name', 'Customer name', 'text'], ['city', 'City', 'text'], ['stars', 'Stars (0 to 5)', 'number'], ['quote', 'Review', 'area']], blank: { name: '', city: '', stars: 5, quote: '' } },
+  ],
+  shop: [
+    { key: 'quotes', title: 'Customer quotes', help: 'Speech-bubble quotes next to the factory video.', item: 'Quote', fields: [['text', 'What they said', 'area'], ['who', 'Who (name, city)', 'text']], blank: { text: '', who: '' } },
+    { key: 'chaat', title: 'Chaat photo gallery', help: 'Mouth-watering pictures under the product list.', item: 'Photo', fields: [['src', 'Picture', 'image'], ['caption', 'Caption', 'text']], blank: { src: '', caption: '' } },
+  ],
+};
+const SINGLES = {
+  home: [['heroImage', 'Main hero picture (big plate at the top)'], ['aboutPhoto', 'About section photo']],
+  shop: [['factoryPoster', 'Factory video cover picture']],
+};
+function repField(path, [k, label, type], val) {
+  const p = `data-path="${path}|${k}"`;
+  if (type === 'image') return imageField(`f-${path}-${k}`, label, val, p);
+  if (type === 'area') return fld(label, `<textarea class="f-ta" ${p}>${esc(val)}</textarea>`);
+  if (type === 'number') return fld(label, `<input class="f-in" type="number" min="0" max="5" step="0.5" ${p} value="${esc(val)}">`);
+  return fld(label, `<input class="f-in" ${p} value="${esc(val)}">`);
+}
+function listCard(section, L) {
+  const arr = D[section][L.key];
+  const head = `<div class="card-h"><h3 class="grow">${L.title}</h3>${arr === null ? '<span class="pill gold">Using built-in default</span>' : `<span class="pill">${arr.length} item${arr.length === 1 ? '' : 's'}</span>`}</div><p class="muted" style="margin:-6px 0 12px">${L.help}</p>`;
+  if (arr === null) return `<div class="card">${head}<div class="banner-default"><b>The website is showing its built-in ${L.title.toLowerCase()}.</b><div class="small muted" style="margin:4px 0 10px">Start customising to replace them with your own.</div><button class="btn" data-custom="${L.key}">Start customising</button></div></div>`;
+  const items = arr.map((it, i) => `<div class="rep"><div class="rep-h"><b>${L.item} ${i + 1}</b><button class="icon-btn" data-mv="${L.key}|${i}|-1" ${i === 0 ? 'disabled' : ''}>&uarr;</button><button class="icon-btn" data-mv="${L.key}|${i}|1" ${i === arr.length - 1 ? 'disabled' : ''}>&darr;</button><button class="btn sm danger" data-rm="${L.key}|${i}">Remove</button></div>
+    ${L.strings ? (L.area ? `<textarea class="f-ta" data-path="${L.key}|${i}">${esc(it)}</textarea>` : `<input class="f-in" data-path="${L.key}|${i}" value="${esc(it)}">`) : `<div class="row r2" style="margin:0">${L.fields.map((f) => repField(`${L.key}|${i}`, f, it[f[0]] ?? '')).join('')}</div>`}</div>`).join('');
+  return `<div class="card">${head}${items || '<div class="empty">Nothing here yet.</div>'}<div class="tools" style="margin:6px 0 0"><button class="btn gold" data-add="${L.key}">+ Add ${L.item.toLowerCase()}</button><span class="grow"></span><button class="btn sm ghost" data-default="${L.key}">Go back to built-in default</button></div></div>`;
+}
+async function pageEditor(section) {
+  const { content } = await api('GET', '/admin/content'); D[section] = JSON.parse(JSON.stringify(content[section]));
+  const render = () => {
+    const singles = (SINGLES[section] || []).length ? `<div class="card"><h3>Main pictures</h3><div class="row r2">${SINGLES[section].map(([k, l]) => imageField(`s-${k}`, l, D[section][k] || '', `data-path="${k}" placeholder="Leave empty to use the built-in picture"`)).join('')}${section === 'shop' ? fld('Factory video link (.mp4)', `<input class="f-in" data-path="factoryVideo" value="${esc(D.shop.factoryVideo || '')}" placeholder="Leave empty to use /videos/factory.mp4">`) : ''}</div></div>` : '';
+    $('#view').innerHTML = `${storageWarning()}<div class="warnbar">Edit anything below, then press <b>Save changes</b>. Visitors see your changes within a few seconds.</div>${singles}${LISTS[section].map((L) => listCard(section, L)).join('')}<button class="btn lg green" id="pgSave2">Save changes</button>`;
+    const save = (e) => act(e.currentTarget, async () => { const r = await api('PUT', '/admin/content/' + section, D[section]); D[section] = r.content; render(); }, 'Page saved – it is live now');
+    $('#pgSave2').onclick = save; $('#topExtra').innerHTML = '<button class="btn green sm" id="pgSave">Save changes</button>'; $('#pgSave').onclick = save;
+  };
+  const root = $('#view');
+  root.oninput = (e) => {
+    const path = e.target.dataset?.path; if (!path) return; let v = e.target.value; const parts = path.split('|');
+    if (parts.length === 1) D[section][parts[0]] = v.trim() ? v : null;
+    else if (parts.length === 2) D[section][parts[0]][Number(parts[1])] = v;
+    else D[section][parts[0]][Number(parts[1])][parts[2]] = parts[2] === 'stars' ? Number(v) : v;
+  };
+  root.onclick = (e) => {
+    const b = e.target.closest('button'); if (!b) return; const d = b.dataset;
+    const L = (key) => LISTS[section].find((x) => x.key === key);
+    if (d.custom) { D[section][d.custom] = []; render(); }
+    else if (d.add) { D[section][d.add].push(JSON.parse(JSON.stringify(L(d.add).blank))); render(); setTimeout(() => $$('.rep').pop()?.scrollIntoView({ block: 'center' }), 30); }
+    else if (d.rm) { const [k, i] = d.rm.split('|'); D[section][k].splice(Number(i), 1); render(); }
+    else if (d.mv) { const [k, i, dir] = d.mv.split('|'); const a = D[section][k]; const x = Number(i); const y = x + Number(dir); [a[x], a[y]] = [a[y], a[x]]; render(); }
+    else if (d.default) { confirmBox('Remove your changes and go back to the website\'s built-in version?', 'Go back', false).then((ok) => { if (ok) { D[section][d.default] = null; render(); } }); }
+  };
+  render();
+}
+VIEWS['p-home'] = () => pageEditor('home');
+VIEWS['p-shop'] = () => pageEditor('shop');
+VIEWS['p-contact'] = async () => {
+  const { content } = await api('GET', '/admin/content'); const c = content.contact;
+  $('#view').innerHTML = `${storageWarning()}<div class="warnbar">These details are used on the Contact page, the top bar and the footer of your website.</div>
+  <div class="card"><h3>Owner</h3><div class="row r2">${fld('Owner name', `<input class="f-in" id="c-ownerName" value="${esc(c.ownerName)}">`)}${fld('Role / title', `<input class="f-in" id="c-ownerRole" value="${esc(c.ownerRole)}">`)}</div>${imageField('ownerPhoto', 'Owner photo', c.ownerPhoto, 'id="c-ownerPhoto"')}<div style="height:14px"></div>${fld('Short message from the owner', `<textarea class="f-ta" id="c-ownerBio">${esc(c.ownerBio)}</textarea>`)}</div>
+  <div class="card"><h3>Phone, WhatsApp &amp; email</h3><div class="row r2">${fld('Phone (as shown)', `<input class="f-in" id="c-phoneDisplay" value="${esc(c.phoneDisplay)}" placeholder="+91 98765 43210">`)}${fld('Phone (for the Call button)', `<input class="f-in" id="c-phoneTel" value="${esc(c.phoneTel)}" placeholder="+919876543210">`, 'With country code, no spaces')}${fld('WhatsApp number', `<input class="f-in" id="c-whatsapp" value="${esc(c.whatsapp)}" placeholder="919876543210">`, 'Country code + number, digits only')}${fld('Email', `<input class="f-in" id="c-email" value="${esc(c.email)}" placeholder="hello@taranhari.com">`)}</div>${fld('Ready-made WhatsApp message', `<input class="f-in" id="c-whatsappMessage" value="${esc(c.whatsappMessage)}">`, 'What the customer\'s message starts with when they tap WhatsApp')}</div>
+  <div class="card"><h3>Social media</h3><div class="row r2">${fld('Instagram link', `<input class="f-in" id="c-instagram" value="${esc(c.instagram)}" placeholder="https://www.instagram.com/yourpage">`)}${fld('Facebook link', `<input class="f-in" id="c-facebook" value="${esc(c.facebook)}">`)}${fld('YouTube link', `<input class="f-in" id="c-youtube" value="${esc(c.youtube)}">`)}</div></div>
+  <div class="card"><h3>Factory address &amp; hours</h3><div class="row r2">${fld('Short address (footer)', `<input class="f-in" id="c-addressShort" value="${esc(c.addressShort)}" placeholder="Nagpur, Maharashtra">`)}${fld('Opening hours', `<input class="f-in" id="c-hours" value="${esc(c.hours)}">`)}</div>${fld('Full address', `<textarea class="f-ta" id="c-addressFull">${esc(c.addressFull)}</textarea>`)}<div style="height:12px"></div>${fld('Google Maps link', `<input class="f-in" id="c-mapUrl" value="${esc(c.mapUrl)}" placeholder="https://maps.google.com/…">`, 'Open your location in Google Maps, tap Share, and paste the link here')}</div>
+  <button class="btn lg green" id="ctSave">Save changes</button>`;
+  const keys = ['ownerName', 'ownerRole', 'ownerPhoto', 'ownerBio', 'phoneDisplay', 'phoneTel', 'whatsapp', 'email', 'whatsappMessage', 'instagram', 'facebook', 'youtube', 'addressShort', 'hours', 'addressFull', 'mapUrl'];
+  const save = (e) => act(e.currentTarget, () => api('PUT', '/admin/content/contact', Object.fromEntries(keys.map((k) => [k, $('#c-' + k).value]))), 'Contact details saved – live now');
+  $('#ctSave').onclick = save; $('#topExtra').innerHTML = '<button class="btn green sm" id="ctSave2">Save changes</button>'; $('#ctSave2').onclick = save;
+};
+
+/* ================================== SETTINGS ================================== */
+VIEWS.settings = async () => {
+  const { settings: s, storage } = await api('GET', '/admin/settings'); S.storage = storage; const inv = s.invoice || {};
+  $('#view').innerHTML = `${storageWarning()}${passWarning()}
+  <div class="card"><h3>Store</h3><div class="row r2">${fld('Store name', `<input class="f-in" id="s-shopName" value="${esc(s.shopName)}">`)}${fld('Tagline', `<input class="f-in" id="s-tagline" value="${esc(s.tagline)}">`)}</div>${fld('Announcement bar message', `<input class="f-in" id="s-announcement" value="${esc(s.announcement)}" placeholder="e.g. Diwali sale: extra 10% off!">`, 'Leave empty to hide it')}
+  <div class="row mt"><label class="chk">${sw(s.acceptingOrders !== false, 'id="s-accepting"')} Accepting website orders <span class="muted small">(turn off when you are closed)</span></label></div></div>
+  <div class="card"><h3>Delivery &amp; discounts</h3><div class="row">${fld('Delivery fee ₹', `<input class="f-in" id="s-deliveryFee" type="number" min="0" value="${esc(s.deliveryFee)}">`)}${fld('Free delivery above ₹', `<input class="f-in" id="s-free" type="number" min="0" value="${esc(s.freeDeliveryAbove)}">`, 'Measured after discounts')}${fld('Minimum order ₹', `<input class="f-in" id="s-minOrder" type="number" min="0" value="${esc(s.minOrder)}">`)}</div>
+  <label class="chk">${sw(s.allowStacking !== false, 'id="s-stack"')} Allow a coupon and an automatic offer on the same order <span class="muted small">(off = customer gets whichever saves more)</span></label></div>
+  <div class="card"><h3>Bill &amp; invoice details</h3><p class="muted" style="margin:-6px 0 12px">Printed at the top of every bill and invoice.</p><div class="row r2">${fld('Business name', `<input class="f-in" id="i-businessName" value="${esc(inv.businessName)}">`)}${fld('Phone', `<input class="f-in" id="i-phone" value="${esc(inv.phone)}">`)}${fld('Email', `<input class="f-in" id="i-email" value="${esc(inv.email)}">`)}${fld('GSTIN (optional)', `<input class="f-in" id="i-gstin" value="${esc(inv.gstin)}">`)}${fld('UPI ID (printed on unpaid bills)', `<input class="f-in" id="i-upiId" value="${esc(inv.upiId)}" placeholder="name@bank">`)}${fld('GST % included in prices', `<input class="f-in" id="s-gst" type="number" min="0" max="100" step="0.5" value="${esc(s.gstPercent)}">`, '0 = do not show GST. Prices already include it.')}</div>${fld('Address', `<textarea class="f-ta" id="i-address">${esc(inv.address)}</textarea>`)}<div style="height:12px"></div>${fld('Footer note', `<input class="f-in" id="i-footerNote" value="${esc(inv.footerNote)}">`)}</div>
+  <button class="btn lg green" id="sSave">Save settings</button>
+  <div class="card mt"><h3>Change admin password</h3><div class="row">${fld('Current password', '<input class="f-in" id="pw-cur" type="password" autocomplete="current-password">')}${fld('New password (min 8 characters)', '<input class="f-in" id="pw-new" type="password" autocomplete="new-password">')}${fld('Repeat new password', '<input class="f-in" id="pw-new2" type="password" autocomplete="new-password">')}</div><button class="btn" id="pwSave">Change password</button><div class="hint">If you ever forget it, set <code>ADMIN_FORCE_ENV_PASSWORD=true</code> in Vercel and sign in with <code>ADMIN_PASSWORD</code>.</div></div>
+  <div class="card"><h3>Backup &amp; data</h3><p class="muted" style="margin:-6px 0 12px">Download a backup regularly. It contains products, categories, orders, coupons, page content and uploaded pictures.</p><div class="tools"><a class="btn" href="/api/admin/export" download>Download backup</a><label class="btn ghost" style="cursor:pointer">Restore from file<input type="file" id="imp" accept="application/json" hidden></label><button class="btn ghost" id="cleanImgs">Delete unused pictures</button><button class="btn danger" id="reset">Restore sample data</button></div></div>`;
+  $('#sSave').onclick = (e) => act(e.currentTarget, () => api('PUT', '/admin/settings', {
+    shopName: $('#s-shopName').value, tagline: $('#s-tagline').value, announcement: $('#s-announcement').value, acceptingOrders: $('#s-accepting').checked,
+    deliveryFee: $('#s-deliveryFee').value, freeDeliveryAbove: $('#s-free').value, minOrder: $('#s-minOrder').value, allowStacking: $('#s-stack').checked, gstPercent: $('#s-gst').value,
+    invoice: { businessName: $('#i-businessName').value, phone: $('#i-phone').value, email: $('#i-email').value, gstin: $('#i-gstin').value, upiId: $('#i-upiId').value, address: $('#i-address').value, footerNote: $('#i-footerNote').value },
+  }), 'Settings saved');
+  $('#pwSave').onclick = (e) => { if ($('#pw-new').value !== $('#pw-new2').value) return toast('The new passwords do not match', 'err'); act(e.currentTarget, async () => { await api('POST', '/admin/password', { current: $('#pw-cur').value, next: $('#pw-new').value }); S.defaultPw = false; ['#pw-cur', '#pw-new', '#pw-new2'].forEach((x) => { $(x).value = ''; }); }, 'Password changed'); };
+  $('#imp').onchange = async (e) => { const f = e.target.files[0]; if (!f) return; if (!(await confirmBox('Restore this backup? Everything currently in the store will be replaced.', 'Restore'))) return; let j; try { j = JSON.parse(await f.text()); } catch { return toast('That file is not a valid backup', 'err'); } act(null, async () => { await api('POST', '/admin/import', j); VIEWS.settings(); }, 'Backup restored'); };
+  $('#cleanImgs').onclick = (e) => act(e.currentTarget, async () => { const r = await api('POST', '/admin/images/cleanup', {}); toast(`${r.removed} unused picture${r.removed === 1 ? '' : 's'} deleted`, 'ok'); });
+  $('#reset').onclick = () => { const m = openModal('Restore sample data', '<p>This <b>deletes all products, orders, coupons and page changes</b> and loads the original sample catalogue. Your password stays the same.</p><label class="f">Type RESET to confirm</label><input class="f-in" id="rs">', '<button class="btn ghost" data-close>Cancel</button><button class="btn danger" id="rsGo">Restore sample data</button>'); $('#rsGo', m).onclick = (e) => act(e.currentTarget, async () => { await api('POST', '/admin/reset', { confirm: $('#rs').value }); closeModal(); VIEWS.settings(); }, 'Sample data restored'); };
+};
+
+boot();
+</script>
+</body>
+</html>

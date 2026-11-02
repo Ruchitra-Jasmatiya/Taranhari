@@ -70,6 +70,10 @@ export function percentOff(price, mrp) {
 
 // Sizes shown in Quick View. Prices scale with weight; bigger packs get 8% off.
 export function getSizes(product) {
+  // Products from the backend already carry their own sizes, prices and stock
+  if (Array.isArray(product.sizes) && product.sizes.length) {
+    return product.sizes.map((s) => ({ ...s, mrp: s.mrp || s.price, inStock: s.inStock !== false }));
+  }
   const baseG = toGrams(product.weight);
   return PACK_SIZES.map((label) => {
     const g = toGrams(label);
@@ -79,6 +83,7 @@ export function getSizes(product) {
       label,
       price: label === product.weight ? product.price : Math.round(product.price * ratio * bulk),
       mrp: label === product.weight ? product.mrp : Math.round(product.mrp * ratio),
+      inStock: true,
     };
   });
 }

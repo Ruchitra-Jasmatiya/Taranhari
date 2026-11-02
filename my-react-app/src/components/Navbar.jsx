@@ -4,9 +4,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronDown, Heart, Home, Phone, ShoppingBag, Store, Truck } from 'lucide-react';
 import Logo from './Logo.jsx';
-import { FREE_DELIVERY_AT, useCart } from '../context/CartContext.jsx';
-import { CONTACT } from '../pages/Contact.jsx';
-import { CATEGORIES } from '../data/products.js';
+import { useCart } from '../context/CartContext.jsx';
+import { useSite } from '../context/SiteContext.jsx';
 import './Navbar.css';
 
 // Round count badge that bounces whenever the number changes
@@ -28,6 +27,8 @@ function Badge({ n }) {
 
 export default function Navbar() {
   const { cartCount, wishCount } = useCart();
+  const { contact: CONTACT, categories, settings } = useSite();
+  const CATEGORIES = categories.map((c) => c.name);
   const { pathname, search, hash } = useLocation();
   const [scrolled, setScrolled] = useState(false);
 
@@ -59,7 +60,8 @@ export default function Navbar() {
       <div className="topbar">
         <div className="container topbar__in">
           <p className="topbar__ship">
-            <Truck size={16} aria-hidden="true" /> Free Shipping on Orders Above ₹{FREE_DELIVERY_AT}
+            <Truck size={16} aria-hidden="true" />{' '}
+            {settings.announcement ? settings.announcement : `Free Shipping on Orders Above ₹${settings.freeDeliveryAbove}`}
           </p>
           <div className="topbar__right">
             <Link to="/contact">Contact</Link>

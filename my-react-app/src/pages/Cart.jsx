@@ -7,6 +7,7 @@
 // =========================================================
 
 import { useMemo, useState } from 'react';
+import { CheckCircle2 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { BadgePercent, Heart, ShoppingBag, Trash2, Truck, X } from 'lucide-react';
@@ -14,8 +15,8 @@ import Img from '../components/Img.jsx';
 import Stepper from '../components/Stepper.jsx';
 import BottomSheet from '../components/BottomSheet.jsx';
 import { VegDot } from '../components/ProductCard.jsx';
-import { COUPONS, FREE_DELIVERY_AT, useCart } from '../context/CartContext.jsx';
-import { products } from '../data/products.js';
+import { useCart } from '../context/CartContext.jsx';
+import { useSite } from '../context/SiteContext.jsx';
 import './Cart.css';
 
 export default function Cart() {
@@ -53,12 +54,14 @@ export default function Cart() {
 
 /* ---------------------------------------------------------- */
 function CartTab({ cart }) {
-  const { items, subtotal, discount, delivery, total, freeLeft, youSaved, coupon, setQty, removeFromCart, applyCoupon, removeCoupon, clearCart } = cart;
+  const { items, subtotal, discount, offer, couponInfo, delivery, total, freeLeft, youSaved, coupon, setQty, removeFromCart, applyCoupon, removeCoupon, clearCart, hasUnavailable, acceptingOrders, minOrder } = cart;
+  const { settings } = useSite();
+  const FREE_DELIVERY_AT = Number(settings.freeDeliveryAbove) || 0;
   const [code, setCode] = useState('');
   const [msg, setMsg] = useState(null); // { ok, message }
   const [checkout, setCheckout] = useState(false);
 
-  const progress = Math.min(100, Math.round(((subtotal - discount) / FREE_DELIVERY_AT) * 100));
+  const progress = Math.min(100, FREE_DELIVERY_AT ? Math.round(((subtotal - discount) / FREE_DELIVERY_AT) * 100) : 100);
 
   if (items.length === 0) {
     return (
@@ -71,10 +74,11 @@ function CartTab({ cart }) {
     );
   }
 
-  const submitCoupon = (e) => {
+  const submitCoupon = async (e) => {
     e.preventDefault();
-    setMsg(applyCoupon(code));
-    if (COUPONS[code.trim().toUpperCase()]) setCode('');
+    const r = await applyCoupon(code);
+    setMsg(r);
+    if (r.ok) setCode('');
   };
 
   return (
@@ -96,8 +100,9 @@ function CartTab({ cart }) {
                 <div className="line__info">
                   <h3 className="line__name"><VegDot veg={it.veg} /> {it.name}</h3>
                   <p className="line__meta">{it.size} &middot; ₹{it.price} each</p>
+                  {it.available === false && <p className="line__meta" style={{ color: 'var(--brand)', fontWeight: 800 }}>{it.issue || 'Not available'} &ndash; please remove it</p>}
                   <div className="line__ctrl">
-                    <Stepper qty={it.qty} onChange={(n) => (n <= 0 ? removeFromCart(it.key) : setQty(it.key, n))} label={it.name} size="sm" />
+                    <Stepper qty={it.qty} max={it.maxQty} onChange={(n) => (n <= 0 ? removeFromCart(it.key) : setQty(it.key, n))} label={it.name} size="sm" />
                     <strong className="line__total">₹{it.price * it.qty}</strong>
                   </div>
                 </div>
@@ -130,13 +135,13 @@ function CartTab({ cart }) {
           {coupon ? (
             <div className="coupon__on">
               <BadgePercent size={20} aria-hidden="true" />
-              <span><strong>{coupon}</strong> applied</span>
+              <span><strong>{coupon}</strong> applied{couponInfo?.amount ? ` (saves ₹${couponInfo.amount})` : ''}</span>
               <button type="button" className="coupon__x" onClick={() => { removeCoupon(); setMsg(null); }} aria-label="Remove coupon"><X size={18} strokeWidth={3} /></button>
             </div>
           ) : (
             <form onSubmit={submitCoupon} className="coupon__form">
               <label htmlFor="coupon" className="sr-only">Coupon code</label>
-              <input id="coupon" value={code} onChange={(e) => { setCode(e.target.value); setMsg(null); }} placeholder="Coupon code (try TARAN10)" autoCapitalize="characters" autoComplete="off" />
+              <input id="coupon" value={code} onChange={(e) => { setCode(e.target.value); setMsg(null); }} placeholder="Coupon code" autoCapitalize="characters" autoComplete="off" />
               <button type="submit" className="btn btn--ink">Apply</button>
             </form>
           )}
@@ -145,32 +150,24 @@ function CartTab({ cart }) {
 
         <dl className="totals">
           <div><dt>Subtotal</dt><dd>₹{subtotal}</dd></div>
-          {discount > 0 && <div className="totals__disc"><dt>Coupon discount</dt><dd>- ₹{discount}</dd></div>}
+          {offer && <div className="totals__disc"><dt>{offer.name}</dt><dd>- ₹{offer.amount}</dd></div>}
+          {couponInfo && <div className="totals__disc"><dt>Coupon {couponInfo.code}</dt><dd>- ₹{couponInfo.amount}</dd></div>}
           <div><dt>Delivery</dt><dd>{delivery === 0 ? 'FREE' : `₹${delivery}`}</dd></div>
           <div className="totals__grand"><dt>Total</dt><dd>₹{total}</dd></div>
         </dl>
         {youSaved > 0 && <p className="saved">You are saving ₹{youSaved} on this order!</p>}
+        {!acceptingOrders && <p className="coupon__msg bad">We are not taking orders right now. Please check back soon.</p>}
+        {acceptingOrders && minOrder > subtotal && <p className="coupon__msg bad">Minimum order is ₹{minOrder}. Add ₹{minOrder - subtotal} more.</p>}
+        {hasUnavailable && <p className="coupon__msg bad">Remove the unavailable item(s) to continue.</p>}
 
         {/* On mobile this block sticks to the bottom above the tab bar */}
         <div className="summary__cta">
           <div className="summary__mini"><span>Total</span><strong>₹{total}</strong></div>
-          <button type="button" className="btn btn--lg" onClick={() => setCheckout(true)}>Checkout</button>
+          <button type="button" className="btn btn--lg" disabled={hasUnavailable || !acceptingOrders || subtotal < minOrder} onClick={() => setCheckout(true)}>Checkout</button>
         </div>
       </aside>
 
-      <BottomSheet
-        open={checkout}
-        onClose={() => setCheckout(false)}
-        title="Checkout"
-        footer={<button type="button" className="btn" onClick={() => setCheckout(false)}>Okay, got it</button>}
-      >
-        <div className="soon">
-          <EmptyBag />
-          <h3>Checkout is coming soon!</h3>
-          <p>We are connecting payments right now. Your cart of <strong>₹{total}</strong> is saved here, and nothing is lost if you refresh.</p>
-          {/* TODO (backend later): collect address, create the order, take payment. */}
-        </div>
-      </BottomSheet>
+      <CheckoutSheet open={checkout} onClose={() => setCheckout(false)} cart={cart} />
     </div>
   );
 }
@@ -178,7 +175,8 @@ function CartTab({ cart }) {
 /* ---------------------------------------------------------- */
 function WishTab({ cart }) {
   const { wishlist, addToCart, toggleWishlist } = cart;
-  const saved = useMemo(() => products.filter((p) => wishlist.includes(p.id)), [wishlist]);
+  const { products } = useSite();
+  const saved = useMemo(() => products.filter((p) => wishlist.includes(p.id)), [wishlist, products]);
 
   if (saved.length === 0) {
     return (
@@ -226,6 +224,63 @@ function WishTab({ cart }) {
         ))}
       </AnimatePresence>
     </ul>
+  );
+}
+
+/* ---------------------------------------------------------- */
+const FORM_KEY = 'taranhari-customer';
+function CheckoutSheet({ open, onClose, cart }) {
+  const { total, subtotal, discount, delivery, checkout } = cart;
+  const [f, setF] = useState(() => {
+    try { return { name: '', phone: '', address: '', city: '', pincode: '', note: '', ...JSON.parse(localStorage.getItem(FORM_KEY) || '{}') }; } catch { return { name: '', phone: '', address: '', city: '', pincode: '', note: '' }; }
+  });
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+  const [done, setDone] = useState(null);
+  const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setBusy(true); setErr('');
+    try {
+      const { note, ...customer } = f;
+      try { localStorage.setItem(FORM_KEY, JSON.stringify({ name: f.name, phone: f.phone, address: f.address, city: f.city, pincode: f.pincode })); } catch { /* ignore */ }
+      const order = await checkout(customer, note);
+      setDone(order);
+    } catch (ex) {
+      setErr(ex.message || 'Could not place the order. Please try again.');
+    } finally { setBusy(false); }
+  };
+  const close = () => { onClose(); setTimeout(() => setDone(null), 300); };
+
+  return (
+    <BottomSheet
+      open={open}
+      onClose={close}
+      title={done ? 'Order placed' : 'Checkout'}
+      footer={done ? <Link to="/shop" className="btn" onClick={close}>Continue shopping</Link> : <button type="submit" form="checkout-form" className="btn btn--lg" disabled={busy}>{busy ? 'Placing order…' : `Place order · ₹${total}`}</button>}
+    >
+      {done ? (
+        <div className="soon">
+          <CheckCircle2 size={72} strokeWidth={2.2} aria-hidden="true" />
+          <h3>Thank you, {done.customer?.name}!</h3>
+          <p>Your order number is <strong>{done.number}</strong>. Total to pay on delivery: <strong>₹{done.total}</strong>. We will call you shortly to confirm.</p>
+        </div>
+      ) : (
+        <form id="checkout-form" onSubmit={submit} className="cofm" style={{ display: 'grid', gap: 12 }}>
+          <label>Your name<input required value={f.name} onChange={set('name')} autoComplete="name" /></label>
+          <label>Phone number<input required type="tel" inputMode="numeric" value={f.phone} onChange={set('phone')} autoComplete="tel" placeholder="10-digit mobile number" /></label>
+          <label>Full delivery address<textarea required rows={3} value={f.address} onChange={set('address')} autoComplete="street-address" /></label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <label>City<input value={f.city} onChange={set('city')} autoComplete="address-level2" /></label>
+            <label>Pincode<input inputMode="numeric" maxLength={6} value={f.pincode} onChange={set('pincode')} autoComplete="postal-code" /></label>
+          </div>
+          <label>Note (optional)<input value={f.note} onChange={set('note')} placeholder="Any request for us?" /></label>
+          <p className="saved" style={{ margin: 0 }}>Subtotal ₹{subtotal}{discount > 0 ? ` · Discount −₹${discount}` : ''} · Delivery {delivery === 0 ? 'FREE' : `₹${delivery}`} · <strong>Pay ₹{total} cash on delivery</strong></p>
+          {err && <p className="coupon__msg bad" role="alert">{err}</p>}
+        </form>
+      )}
+    </BottomSheet>
   );
 }
 

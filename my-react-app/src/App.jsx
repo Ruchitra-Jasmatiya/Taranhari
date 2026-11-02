@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ToastProvider } from './components/Toast.jsx';
+import { SiteProvider } from './context/SiteContext.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import Intro from './components/Intro.jsx';
 import Navbar from './components/Navbar.jsx';
@@ -69,6 +70,7 @@ export default function App() {
 
   return (
     <ToastProvider>
+      <SiteProvider>
       <CartProvider>
         <a href="#main" className="skip-link">Skip to content</a>
 
@@ -91,6 +93,7 @@ export default function App() {
 
         <Footer />
       </CartProvider>
+      </SiteProvider>
     </ToastProvider>
   );
 }

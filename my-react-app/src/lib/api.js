@@ -1,34 +1,73 @@
 // =========================================================
-// api.js - the ONLY place the app gets product data from.
-//
-// Right now it reads src/data/products.js. When your backend
-// is ready, swap the bodies for fetch() calls, e.g.:
-//
-//   export async function getProducts() {
-//     const res = await fetch('/api/products');
-//     return res.json();
-//   }
-//
-// Nothing else in the app needs to change.
+// api.js - talks to the Taran Hari backend (/api/*).
+// If the backend is not reachable (for example `npm run dev`
+// without the API), the site quietly falls back to the built-in
+// sample data so it never shows a blank page.
 // =========================================================
 
-import { products } from '../data/products.js';
+import { products as sample } from '../data/products.js';
 
-// Small fake delay so loading states can be tested. Set to 0 to remove.
-const FAKE_DELAY_MS = 120;
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-// All products (optionally filtered by category name)
-export async function getProducts(category) {
-  await wait(FAKE_DELAY_MS);
-  if (category && category !== 'All') {
-    return products.filter((p) => p.category === category);
+async function request(method, path, body) {
+  const res = await fetch(`/api${path}`, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+    cache: 'no-store',
+  });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch {
+    /* not JSON */
   }
-  return [...products];
+  if (!res.ok) {
+    const err = new Error((data && data.error) || 'Something went wrong. Please try again.');
+    err.status = res.status;
+    throw err;
+  }
+  return data;
 }
 
-// One product by id (or null if not found)
+/** Everything the website needs in one call (products, categories, contact, home, shop, settings). */
+export async function fetchSite() {
+  const data = await request('GET', '/site');
+  if (!data || !Array.isArray(data.products)) throw new Error('Bad site data');
+  return data;
+}
+
+export async function fetchVersion() {
+  const d = await request('GET', '/version');
+  return d.v;
+}
+
+export async function getProducts(category) {
+  try {
+    const d = await fetchSite();
+    return category && category !== 'All' ? d.products.filter((p) => p.category === category) : d.products;
+  } catch {
+    return category && category !== 'All' ? sample.filter((p) => p.category === category) : [...sample];
+  }
+}
+
 export async function getProduct(id) {
-  await wait(FAKE_DELAY_MS);
-  return products.find((p) => p.id === id) || null;
+  try {
+    return (await request('GET', `/products/${encodeURIComponent(id)}`)).product;
+  } catch {
+    return sample.find((p) => p.id === id) || null;
+  }
+}
+
+/** Server-side price check (offers, coupon, delivery). items: [{id,size,qty}] */
+export async function quoteCart(items, coupon) {
+  return (await request('POST', '/cart/quote', { items, coupon: coupon || '' })).quote;
+}
+
+/** Place a real order. customer: {name, phone, address, city, pincode, email} */
+export async function placeOrder({ items, coupon, customer, note }) {
+  return (await request('POST', '/orders', { items, coupon: coupon || '', customer, note })).order;
+}
+
+export async function trackOrder(number, phone) {
+  const q = new URLSearchParams({ number, phone });
+  return (await request('GET', `/orders/track?${q}`)).order;
 }

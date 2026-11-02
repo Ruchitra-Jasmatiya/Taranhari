@@ -34,7 +34,7 @@ export default function QuickView({ product, onClose }) {
   if (!p) return <BottomSheet open={false} onClose={onClose} title="" />;
 
   const sizes = getSizes(p);
-  const chosen = sizes.find((s) => s.label === size) || sizes[0];
+  const chosen = sizes.find((s) => s.label === size) || sizes.find((s) => s.inStock) || sizes[0];
   const key = makeKey(p.id, chosen.label);
   const qty = getQty(key);
   const wished = wishlist.includes(p.id);
@@ -65,12 +65,12 @@ export default function QuickView({ product, onClose }) {
                 <button
                   key={s.label}
                   type="button"
-                  className={`chip ${s.label === chosen.label ? 'is-on' : ''}`}
+                  className={`chip ${s.label === chosen.label ? 'is-on' : ''} ${s.inStock ? '' : 'is-out'}`}
                   onClick={() => setSize(s.label)}
                   aria-pressed={s.label === chosen.label}
                 >
                   <strong>{s.label}</strong>
-                  <span>₹{s.price}</span>
+                  <span>{s.inStock ? `₹${s.price}` : 'Sold out'}</span>
                 </button>
               ))}
             </div>
@@ -81,8 +81,12 @@ export default function QuickView({ product, onClose }) {
             {chosen.mrp > chosen.price && <s>₹{chosen.mrp}</s>}
           </p>
 
+          {chosen.inStock && chosen.left > 0 && <p className="qv__left">Hurry, only {chosen.left} left in this pack!</p>}
+
           <div className="qv__actions">
-            {qty === 0 ? (
+            {!chosen.inStock ? (
+              <button type="button" className="btn btn--lg qv__add" disabled>Out of stock</button>
+            ) : qty === 0 ? (
               <button
                 type="button"
                 ref={addRef}
