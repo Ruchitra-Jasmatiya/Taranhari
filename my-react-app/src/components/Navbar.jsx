@@ -1,8 +1,7 @@
-
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronDown, Heart, Home, Phone, ShoppingBag, Store, Truck } from 'lucide-react';
+import { ChevronDown, Heart, Home, Menu, Phone, ShoppingBag, Store, Truck, X } from 'lucide-react';
 import Logo from './Logo.jsx';
 import { useCart } from '../context/CartContext.jsx';
 import { useSite } from '../context/SiteContext.jsx';
@@ -31,6 +30,7 @@ export default function Navbar() {
   const CATEGORIES = categories.map((c) => c.name);
   const { pathname, search, hash } = useLocation();
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const onCart = pathname === '/cart';
   const wishTab = onCart && new URLSearchParams(search).get('tab') === 'wishlist';
@@ -39,8 +39,6 @@ export default function Navbar() {
   const active = {
     home: pathname === '/' && !hash,
     shop: pathname === '/shop',
-    about: pathname === '/' && hash === '#about',
-    promise: pathname === '/' && hash === '#promise',
     contact: pathname === '/contact',
   };
 
@@ -51,6 +49,11 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname, search, hash]);
 
   const cls = (on) => `nav__link ${on ? 'is-active' : ''}`;
 
@@ -93,9 +96,7 @@ export default function Navbar() {
               </ul>
             </div>
             
-            <Link to="/#about" className={cls(active.about)}>About Us</Link>
-            <Link to="/#promise" className={cls(active.promise)}>Our Promise</Link>
-            <Link to="/contact" className={cls(active.contact)}>Contact Us</Link>
+            <Link to="/contact" className={cls(active.contact)}>Contact</Link>
           </nav>
 
           <div className="nav__icons">
@@ -116,8 +117,40 @@ export default function Navbar() {
               <ShoppingBag size={22} strokeWidth={2.2} />
               <Badge n={cartCount} />
             </Link>
+            
+            {/* Mobile 3-line Menu Toggle Button */}
+            <button
+              type="button"
+              className={`nav__icon nav__menuToggle ${mobileMenuOpen ? 'is-active' : ''}`}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle navigation menu"
+            >
+              {mobileMenuOpen ? <X size={24} strokeWidth={2.2} /> : <Menu size={24} strokeWidth={2.2} />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Dropdown / Drawer Menu for the 3 links */}
+        {mobileMenuOpen && (
+          <motion.div 
+            className="nav__mobileDropdown"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            <div className="container nav__mobileDropdownIn">
+              <Link to="/" className={`nav__mobileLink ${active.home ? 'is-active' : ''}`}>
+                Home
+              </Link>
+              <Link to="/shop" className={`nav__mobileLink ${active.shop ? 'is-active' : ''}`}>
+                Our Products
+              </Link>
+              <Link to="/contact" className={`nav__mobileLink ${active.contact ? 'is-active' : ''}`}>
+                Contact
+              </Link>
+            </div>
+          </motion.div>
+        )}
       </header>
 
       {/* Mobile bottom tab bar */}
@@ -128,7 +161,7 @@ export default function Navbar() {
         </Link>
         <Link to="/shop" className={`tab ${active.shop ? 'active' : ''}`}>
           <Store size={22} strokeWidth={2.4} />
-          <span>Shop</span>
+          <span>Products</span>
         </Link>
         <Link to="/contact" className={`tab ${active.contact ? 'active' : ''}`}>
           <Phone size={22} strokeWidth={2.4} />

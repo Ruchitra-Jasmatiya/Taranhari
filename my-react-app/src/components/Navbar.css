@@ -44,7 +44,7 @@
 .nav .logo__tag { display: none; }
 
 .nav__links { display: none; }
-.nav__icons { display: flex; gap: var(--s-2); }
+.nav__icons { display: flex; gap: var(--s-2); align-items: center; }
 
 .nav__icon {
   position: relative;
@@ -55,6 +55,8 @@
   color: var(--ink);
   border: 2px solid var(--ink);
   border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
   transition: transform var(--t-fast) var(--ease), background var(--t-fast), color var(--t-fast);
 }
 .nav__icon:hover { background: var(--accent); transform: translateY(-2px); }
@@ -80,6 +82,42 @@
   line-height: 1;
 }
 .nav__icon.is-active .badge { background: var(--accent); color: var(--ink); }
+
+/* ---------- Mobile dropdown menu (3 lines toggle) ---------- */
+.nav__menuToggle {
+  display: grid; /* visible on mobile/tablet until desktop */
+}
+@media (min-width: 1000px) {
+  .nav__menuToggle { display: none; }
+}
+
+.nav__mobileDropdown {
+  background: var(--paper);
+  border-bottom: 2px solid var(--accent);
+  padding: var(--s-3) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nav__mobileDropdownIn {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nav__mobileLink {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 var(--s-4);
+  border-radius: var(--r-sm);
+  font-weight: 600;
+  color: var(--ink);
+  transition: background var(--t-fast);
+}
+.nav__mobileLink:hover,
+.nav__mobileLink.is-active {
+  background: var(--accent);
+}
 
 /* ---------- Bottom tab bar (mobile only) ---------- */
 .tabbar {
