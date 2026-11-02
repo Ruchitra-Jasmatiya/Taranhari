@@ -1,9 +1,4 @@
-// =========================================================
-// api.js - talks to the Taran Hari backend (/api/*).
-// If the backend is not reachable (for example `npm run dev`
-// without the API), the site quietly falls back to the built-in
-// sample data so it never shows a blank page.
-// =========================================================
+
 
 import { products as sample } from '../data/products.js';
 
@@ -63,8 +58,8 @@ export async function quoteCart(items, coupon) {
 }
 
 /** Place a real order. customer: {name, phone, address, city, pincode, email} */
-export async function placeOrder({ items, coupon, customer, note }) {
-  return (await request('POST', '/orders', { items, coupon: coupon || '', customer, note })).order;
+export async function placeOrder({ items, coupon, customer, note, website = '', elapsed = 0 }) {
+  return (await request('POST', '/orders', { items, coupon: coupon || '', customer, note, website, elapsed })).order;
 }
 
 export async function trackOrder(number, phone) {

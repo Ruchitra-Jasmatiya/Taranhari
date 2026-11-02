@@ -297,8 +297,9 @@ export function CartProvider({ children }) {
 
   // Send the order to the backend. Throws an Error with a friendly message.
   const checkout = useCallback(
-    async (customer, note) => {
+    async (customer, note, extra = {}) => {
       const order = await sendOrder({
+        ...extra,
         items: state.items.map((i) => ({ id: i.id, size: i.size, qty: i.qty })),
         coupon: state.coupon,
         customer,

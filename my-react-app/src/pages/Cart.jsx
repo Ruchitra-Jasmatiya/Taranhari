@@ -1,12 +1,6 @@
-// =========================================================
-// Cart.jsx - Cart tab + Wishlist tab (chosen by ?tab=wishlist).
-// Cart: line items, quantity, remove with Undo toast, coupon,
-// free-delivery progress bar, sticky mobile summary + Checkout.
-// Wishlist: saved items, Move to Cart, Remove.
-// Checkout is a placeholder until the backend is connected.
-// =========================================================
 
-import { useMemo, useState } from 'react';
+
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -60,17 +54,22 @@ function CartTab({ cart }) {
   const [code, setCode] = useState('');
   const [msg, setMsg] = useState(null); // { ok, message }
   const [checkout, setCheckout] = useState(false);
+  const [done, setDone] = useState(null); // lives here so it survives the cart emptying
 
   const progress = Math.min(100, FREE_DELIVERY_AT ? Math.round(((subtotal - discount) / FREE_DELIVERY_AT) * 100) : 100);
 
   if (items.length === 0) {
     return (
-      <div className="cempty sticker">
-        <EmptyBag />
-        <h2>Cart khaali hai!</h2>
-        <p>Even the crunchiest snack cannot jump in by itself. Let us fill this bag with something tasty.</p>
-        <Link to="/shop" className="btn btn--lg">Start Shopping</Link>
-      </div>
+      <>
+        <div className="cempty sticker">
+          <EmptyBag />
+          <h2>Cart khaali hai!</h2>
+          <p>Even the crunchiest snack cannot jump in by itself. Let us fill this bag with something tasty.</p>
+          <Link to="/shop" className="btn btn--lg">Start Shopping</Link>
+        </div>
+        {/* stays mounted so the customer still sees "Order placed" after the cart empties */}
+        <CheckoutSheet open={checkout} onClose={() => setCheckout(false)} cart={cart} done={done} setDone={setDone} />
+      </>
     );
   }
 
@@ -167,7 +166,7 @@ function CartTab({ cart }) {
         </div>
       </aside>
 
-      <CheckoutSheet open={checkout} onClose={() => setCheckout(false)} cart={cart} />
+      <CheckoutSheet open={checkout} onClose={() => setCheckout(false)} cart={cart} done={done} setDone={setDone} />
     </div>
   );
 }
@@ -229,14 +228,16 @@ function WishTab({ cart }) {
 
 /* ---------------------------------------------------------- */
 const FORM_KEY = 'taranhari-customer';
-function CheckoutSheet({ open, onClose, cart }) {
+function CheckoutSheet({ open, onClose, cart, done, setDone }) {
   const { total, subtotal, discount, delivery, checkout } = cart;
   const [f, setF] = useState(() => {
     try { return { name: '', phone: '', address: '', city: '', pincode: '', note: '', ...JSON.parse(localStorage.getItem(FORM_KEY) || '{}') }; } catch { return { name: '', phone: '', address: '', city: '', pincode: '', note: '' }; }
   });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  const [done, setDone] = useState(null);
+  const [trap, setTrap] = useState(''); // hidden field: real people never fill it
+  const openedAt = useRef(Date.now());
+  useEffect(() => { if (open) openedAt.current = Date.now(); }, [open]);
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
 
   const submit = async (e) => {
@@ -245,7 +246,7 @@ function CheckoutSheet({ open, onClose, cart }) {
     try {
       const { note, ...customer } = f;
       try { localStorage.setItem(FORM_KEY, JSON.stringify({ name: f.name, phone: f.phone, address: f.address, city: f.city, pincode: f.pincode })); } catch { /* ignore */ }
-      const order = await checkout(customer, note);
+      const order = await checkout(customer, note, { website: trap, elapsed: Date.now() - openedAt.current });
       setDone(order);
     } catch (ex) {
       setErr(ex.message || 'Could not place the order. Please try again.');
@@ -276,6 +277,9 @@ function CheckoutSheet({ open, onClose, cart }) {
             <label>Pincode<input inputMode="numeric" maxLength={6} value={f.pincode} onChange={set('pincode')} autoComplete="postal-code" /></label>
           </div>
           <label>Note (optional)<input value={f.note} onChange={set('note')} placeholder="Any request for us?" /></label>
+          <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, overflow: 'hidden' }}>
+            <label>Leave this empty<input tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} name="website" /></label>
+          </div>
           <p className="saved" style={{ margin: 0 }}>Subtotal ₹{subtotal}{discount > 0 ? ` · Discount −₹${discount}` : ''} · Delivery {delivery === 0 ? 'FREE' : `₹${delivery}`} · <strong>Pay ₹{total} cash on delivery</strong></p>
           {err && <p className="coupon__msg bad" role="alert">{err}</p>}
         </form>

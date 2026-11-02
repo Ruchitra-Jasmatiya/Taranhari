@@ -84,10 +84,40 @@ export default async function handler(req, res) {
 
 const bump = () => ['INCR', 'ver'];
 const noSecret = ({ passwordHash, passwordSalt, ...rest }) => rest;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/** Security / admin activity log (newest 300 kept). Never throws - logging must not break a request. */
+async function logActivity(kind, text, ip = '') {
+  try {
+    const id = await db.nextId('activity');
+    await db.cmd('HSET', 'activity', String(id), JSON.stringify({ id, ts: Date.now(), kind, text: String(text).slice(0, 200), ip: String(ip).slice(0, 60) }));
+    if (id % 25 === 0 && id > 300) {
+      const old = (await db.all('activity')).filter((e) => e.id <= id - 300).map((e) => ['HDEL', 'activity', String(e.id)]);
+      if (old.length) await db.pipe(old);
+    }
+  } catch { /* ignore */ }
+}
+const siteOrigin = (req) => {
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim().toLowerCase();
+  if (!/^[a-z0-9.-]+(:\d+)?$/.test(host)) return '';
+  const proto = String(req.headers['x-forwarded-proto'] || '').split(',')[0].trim() === 'https' || process.env.VERCEL ? 'https' : 'http';
+  return `${proto}://${host}`;
+};
 const imgUrlsIn = (o) => [...new Set(JSON.stringify(o ?? '').match(/\/api\/images\/[a-f0-9]+/g) || [])];
 
 /* ================================== PUBLIC ================================== */
 pub('GET', '/health', async () => ({ ok: true, storage: db.mode, persistent: db.persistent, time: Date.now() }));
+pub('GET', '/robots.txt', async ({ req }) => {
+  const o = siteOrigin(req);
+  return { __raw: true, body: `User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /api/\n${o ? `\nSitemap: ${o}/sitemap.xml\n` : ''}`, __headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } };
+});
+pub('GET', '/sitemap.xml', async ({ req }) => {
+  const o = siteOrigin(req);
+  const day = new Date().toISOString().slice(0, 10);
+  const pages = [['/', '1.0', 'weekly'], ['/shop', '0.9', 'daily'], ['/contact', '0.6', 'monthly'], ['/privacy', '0.2', 'yearly'], ['/terms', '0.2', 'yearly'], ['/refund', '0.2', 'yearly']];
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map(([u, pr, f]) => `  <url><loc>${o}${u}</loc><lastmod>${day}</lastmod><changefreq>${f}</changefreq><priority>${pr}</priority></url>`).join('\n')}\n</urlset>\n`;
+  return { __raw: true, body: xml, __headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } };
+});
 pub('GET', '/version', async () => ({ v: await db.version() }));
 
 // Everything the website needs, in ONE call. The version is used as an ETag so polling is a cheap 304.
@@ -134,6 +164,15 @@ pub('POST', '/cart/quote', async ({ body, ip }) => {
 });
 pub('POST', '/orders', async ({ body, ip }) => {
   if ((await db.hit(`order:${ip}`, 3600)) > 15) throw new HttpError(429, 'Too many orders from this device. Please try later.');
+  // Bot protection: a hidden field real people never fill, and a minimum time to fill the form
+  if (str(body.website, 200)) { await logActivity('blocked', 'Blocked a bot order (hidden field filled)', ip); throw bad('Could not place the order. Please try again.'); }
+  if (!(Number(body.elapsed) >= 1500)) throw new HttpError(429, 'Please wait a moment and press Place order again.');
+  // At most 3 unconfirmed orders per phone number at a time
+  const phone = digits(body.customer?.phone).slice(-10);
+  if (phone.length === 10) {
+    const open = (await db.all('orders')).filter((x) => x.status === 'pending' && digits(x.customer?.phone).slice(-10) === phone).length;
+    if (open >= 3) throw new HttpError(429, 'You already have several orders waiting for confirmation. We will call you shortly.');
+  }
   const o = await placeOrder(body, { ip });
   const { items, customer, ...rest } = safeOrder(o);
   return { __status: 201, order: { ...rest, items: items.map((i) => ({ name: i.name, size: i.size, qty: i.qty, price: i.price, lineTotal: i.lineTotal })), customer: { name: customer.name } } };
@@ -150,18 +189,25 @@ pub('GET', '/orders/track', async ({ query, ip }) => {
 
 /* =================================== ADMIN =================================== */
 pub('POST', '/admin/login', async ({ req, res, body, ip }) => {
-  if ((await db.hit(`login:${ip}`, 900)) > 8) throw new HttpError(429, 'Too many attempts. Try again in 15 minutes.');
+  if ((await db.hit(`login:${ip}`, 900)) > 8) { await logActivity('security', 'Sign-in blocked: too many attempts', ip); throw new HttpError(429, 'Too many attempts. Try again in 15 minutes.'); }
+  if ((await db.hit('login:all', 900)) > 60) throw new HttpError(429, 'Sign-in is temporarily locked because of too many attempts. Try again in 15 minutes.');
   const settings = (await db.getJSON('settings')) || {};
   const r = await auth.verifyPassword(body.password, settings);
   if (r.notConfigured) throw new HttpError(503, 'Admin password is not configured. Add ADMIN_PASSWORD in your Vercel project environment variables and redeploy.');
-  if (!r.ok) throw new HttpError(401, 'Wrong password');
+  if (!r.ok) {
+    const fails = await db.hit(`loginfail:${ip}`, 3600);
+    await logActivity('security', 'Wrong password entered', ip);
+    await sleep(Math.min(fails, 5) * 500); // each wrong try makes the next answer slower
+    throw new HttpError(401, 'Wrong password');
+  }
+  await logActivity('login', 'Signed in to admin', ip);
   res.setHeader('Set-Cookie', auth.sessionCookie(req, await auth.signToken(settings)));
   return { ok: true, usingDefaultPassword: !!r.isDefault };
 });
 pub('POST', '/admin/logout', async ({ req, res }) => { res.setHeader('Set-Cookie', auth.sessionCookie(req, '')); return { ok: true }; });
 pub('GET', '/admin/session', async ({ req }) => ({ authenticated: await auth.isAdmin(req), storage: { mode: db.mode, persistent: db.persistent } }));
 
-adm('POST', '/admin/password', async ({ req, res, body }) => {
+adm('POST', '/admin/password', async ({ req, res, body, ip }) => {
   const settings = (await db.getJSON('settings')) || {};
   const ok = await auth.verifyPassword(body.current, settings);
   if (!ok.ok) throw new HttpError(403, 'Current password is wrong');
@@ -170,10 +216,12 @@ adm('POST', '/admin/password', async ({ req, res, body }) => {
   const { salt, hash } = auth.hashPassword(next);
   const upd = { ...settings, passwordSalt: salt, passwordHash: hash };
   await db.setJSON('settings', upd);
+  await logActivity('security', 'Admin password changed', ip);
   res.setHeader('Set-Cookie', auth.sessionCookie(req, await auth.signToken(upd)));
   return { ok: true };
 });
 
+adm('GET', '/admin/activity', async () => ({ activity: (await db.all('activity')).sort((a, b) => b.id - a.id).slice(0, 100) }));
 adm('GET', '/admin/stats', async ({ query }) => stats(num(query.tz, 330)));
 
 /* ---- categories ---- */
@@ -419,7 +467,8 @@ adm('POST', '/admin/images/cleanup', async () => {
 });
 
 /* ---- backup / restore ---- */
-adm('GET', '/admin/export', async ({ res }) => {
+adm('GET', '/admin/export', async ({ res, ip }) => {
+  await logActivity('security', 'Backup downloaded', ip);
   const [products, categories, coupons, offers, orders, settings, content] = await Promise.all([db.all('products'), db.all('categories'), db.all('coupons'), db.all('offers'), db.all('orders'), db.getJSON('settings'), db.getJSON('content')]);
   const { passwordHash, passwordSalt, ...s } = settings || {};
   const imgs = {};
@@ -427,7 +476,7 @@ adm('GET', '/admin/export', async ({ res }) => {
   const body = JSON.stringify({ app: 'taranhari', exportedAt: new Date().toISOString(), products, categories, coupons, offers, orders, settings: s, content, images: imgs });
   return { __raw: true, body, __headers: { 'Content-Disposition': `attachment; filename="taranhari-backup-${new Date().toISOString().slice(0, 10)}.json"` } };
 });
-adm('POST', '/admin/import', async ({ body }) => {
+adm('POST', '/admin/import', async ({ body, ip }) => {
   if (!Array.isArray(body.products) || !Array.isArray(body.categories)) throw bad('This does not look like a Taran Hari backup file');
   const cur = (await db.getJSON('settings')) || {};
   await db.wipeAll();
@@ -449,14 +498,16 @@ adm('POST', '/admin/import', async ({ body }) => {
   cmds.push(['SET', 'seq:product', String(Math.max(0, ...body.products.map((p) => num(String(p.id).replace(/\D/g, '')))))]);
   cmds.push(bump());
   await db.pipe(cmds);
+  await logActivity('security', 'Backup restored', ip);
   return { ok: true };
 });
-adm('POST', '/admin/reset', async ({ body }) => {
+adm('POST', '/admin/reset', async ({ body, ip }) => {
   if (body.confirm !== 'RESET') throw bad('Type RESET to confirm');
   const cur = (await db.getJSON('settings')) || {};
   await db.wipeAll();
   await db.cmd('SET', 'meta:seeded', '1');
   await writeSeed();
   if (cur.passwordHash) { const s = await getSettings(); await db.setJSON('settings', { ...s, passwordHash: cur.passwordHash, passwordSalt: cur.passwordSalt }); }
+  await logActivity('security', 'Sample data restored (reset)', ip);
   return { ok: true };
 });

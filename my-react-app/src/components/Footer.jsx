@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Mail, MapPin, MessageCircle, Phone, Youtube } from 'lucide-react';
@@ -99,7 +98,9 @@ export default function Footer() {
       </div>
 
       <div className="container footer__bottom">
-        <p>&copy; {year} Taran Hari. All rights reserved.</p>
+        <p>
+          &copy; {year} Taran Hari. All rights reserved. &middot; <Link to="/privacy">Privacy</Link> &middot; <Link to="/terms">Terms</Link> &middot; <Link to="/refund">Refunds &amp; delivery</Link>
+        </p>
 
         {/* Theme switcher - remove once you have picked a theme */}
         <div className="footer__themes" role="group" aria-label="Try a colour theme">

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight, Flame, Leaf, ShieldCheck, Sparkles, Truck, X } from 'lucide-react';
@@ -41,8 +41,8 @@ const MINI_BLOCKS_DEFAULT = [
 // Showcase Videos with Specific Titles
 const SHOWCASE_VIDEOS_DEFAULT = [
   { src: vid1, title: 'Bhel Masterclass' },
-  { src: vid2, title: 'Pani Puri Perfection' },
-  { src: vid3, title: 'Khasta Puri Craft' },
+  { src: vid2, title: 'Khasta Puri Craft ' },
+  { src: vid3, title: 'Pani Puri Perfection' },
 ];
 
 const HERO_IMAGE_DEFAULT = img1;
@@ -102,7 +102,7 @@ export default function Home() {
   );
 }
 
-/* ---------- 1. Hero (Single Clean Circle) ---------- */
+/* ---------- 1. Hero (Big Square Picture) ---------- */
 function Hero() {
   const { home, categories, live } = useSite();
   const HERO_IMAGE = home.heroImage || HERO_IMAGE_DEFAULT;
@@ -124,66 +124,81 @@ function Hero() {
           </motion.div>
         </div>
 
-        <motion.div className="hero__visual" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}>
-          {/* Single clean plate circle */}
+        <motion.div className="hero__visual" initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}>
+          {/* Big square picture with colourful blocks behind it */}
+          <span className="hero__block hero__block--gold" aria-hidden="true" />
+          <span className="hero__block hero__block--green" aria-hidden="true" />
           <div className="hero__plate-single">
             <Img src={HERO_IMAGE} alt="A heaped bowl of premium namkeen" eager />
           </div>
+          <span className="hero__chip" aria-hidden="true">Fried fresh daily</span>
         </motion.div>
       </div>
     </section>
   );
 }
 
-/* ---------- 2. Dynamic Banner Slider (Pure Images, Auto-transition 3s) ---------- */
+/* ---------- 2. Dynamic Banner Slider (whole picture always visible, auto-transition 3s) ---------- */
 function BannerSlider() {
-  const { home, categories, live } = useSite();
+  const { home } = useSite();
   const BANNER_IMAGES = home.banners?.length ? home.banners : BANNER_IMAGES_DEFAULT;
+  const count = BANNER_IMAGES.length;
   const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const at = current % count; // safe even if the admin removes banners while this is open
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % BANNER_IMAGES.length);
-    }, 3000);
+    if (paused || count < 2) return undefined;
+    const timer = setInterval(() => setCurrent((prev) => (prev + 1) % count), 3000);
     return () => clearInterval(timer);
-  }, []);
+  }, [count, paused]);
+
+  const go = (n) => setCurrent((n + count) % count);
 
   return (
-    <section className="banner-slider-section">
-      <div className="container">
-        <div className="banner__slider-container">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={current}
-              className="banner__slide-pure"
-              initial={{ opacity: 0, scale: 1.02 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.6, ease: 'easeInOut' }}
-            >
-              <img src={BANNER_IMAGES[current].src} alt={BANNER_IMAGES[current].alt} className="banner__pure-img" />
-            </motion.div>
-          </AnimatePresence>
+    <section className="banner-slider-section" aria-label="Featured pictures">
+      <div
+        className="banner__slider-container"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={at}
+            className="banner__slide-pure"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55, ease: 'easeInOut' }}
+          >
+            {/* soft blurred copy fills the empty sides, the real picture sits on top uncropped */}
+            <img src={BANNER_IMAGES[at].src} alt="" aria-hidden="true" className="banner__bg-img" />
+            <img src={BANNER_IMAGES[at].src} alt={BANNER_IMAGES[at].alt || 'Taranhari snacks'} className="banner__pure-img" />
+          </motion.div>
+        </AnimatePresence>
 
-          <div className="banner__controls">
-            <button onClick={() => setCurrent((current - 1 + BANNER_IMAGES.length) % BANNER_IMAGES.length)} aria-label="Previous Slide">
+        {count > 1 && (
+          <>
+            <button type="button" className="banner__arrow banner__arrow--prev" onClick={() => go(at - 1)} aria-label="Previous slide">
               <ChevronLeft size={22} />
             </button>
-            <div className="banner__dots">
+            <button type="button" className="banner__arrow banner__arrow--next" onClick={() => go(at + 1)} aria-label="Next slide">
+              <ChevronRight size={22} />
+            </button>
+            <div className="banner__dots" role="group" aria-label="Choose slide">
               {BANNER_IMAGES.map((_, idx) => (
                 <button
                   key={idx}
-                  className={`banner__dot ${idx === current ? 'active' : ''}`}
+                  type="button"
+                  className={`banner__dot ${idx === at ? 'active' : ''}`}
                   onClick={() => setCurrent(idx)}
                   aria-label={`Go to slide ${idx + 1}`}
+                  aria-current={idx === at}
                 />
               ))}
             </div>
-            <button onClick={() => setCurrent((current + 1) % BANNER_IMAGES.length)} aria-label="Next Slide">
-              <ChevronRight size={22} />
-            </button>
-          </div>
-        </div>
+          </>
+        )}
       </div>
     </section>
   );
@@ -210,81 +225,117 @@ function Marquee() {
   );
 }
 
-/* ---------- 4. Media Showcase & Video Lightbox Carousel ---------- */
+/* ---------- 4. Media Showcase & Video Lightbox ---------- */
+
+// One video card. It takes the video's own shape, so the whole video is always visible (never cropped).
+function VideoCard({ vid, i, onOpen }) {
+  const [ratio, setRatio] = useState(null);
+  return (
+    <motion.div
+      className="video-box"
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: i * 0.1 }}
+      onClick={() => onOpen(vid)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(vid); } }}
+      role="button"
+      tabIndex={0}
+      aria-label={`Play ${vid.title} full screen`}
+    >
+      <div className="video-player-wrap" style={{ aspectRatio: ratio || '4 / 5' }}>
+        <video
+          src={vid.src}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="metadata"
+          className="master-video"
+          onLoadedMetadata={(e) => {
+            const { videoWidth: w, videoHeight: h } = e.currentTarget;
+            if (w && h) setRatio(`${w} / ${h}`);
+          }}
+        />
+        <span className="video-tap-hint">Tap to zoom &amp; play</span>
+      </div>
+      <div className="video-info">
+        <h4>{vid.title}</h4>
+        {vid.desc ? <p>{vid.desc}</p> : null}
+      </div>
+    </motion.div>
+  );
+}
+
 function MediaShowcase() {
-  const { home, categories, live } = useSite();
+  const { home } = useSite();
   const MINI_BLOCKS = home.blocks?.length ? home.blocks : MINI_BLOCKS_DEFAULT;
   const SHOWCASE_VIDEOS = home.videos?.length ? home.videos : SHOWCASE_VIDEOS_DEFAULT;
   const [activeVideo, setActiveVideo] = useState(null);
-  const [videoIdx, setVideoIdx] = useState(0);
+  const stripRef = useRef(null);
 
-  const nextVideo = () => setVideoIdx((prev) => (prev + 1) % SHOWCASE_VIDEOS.length);
-  const prevVideo = () => setVideoIdx((prev) => (prev - 1 + SHOWCASE_VIDEOS.length) % SHOWCASE_VIDEOS.length);
+  // Phones: the videos sit in one swipeable row. These buttons slide that row.
+  const slide = useCallback((dir) => {
+    const el = stripRef.current;
+    if (!el) return;
+    const card = el.children[0];
+    const step = (card ? card.getBoundingClientRect().width : el.clientWidth * 0.8) + 16;
+    el.scrollBy({ left: dir * step, behavior: 'smooth' });
+  }, []);
+
+  // Close the zoomed video with the Escape key
+  useEffect(() => {
+    if (!activeVideo) return undefined;
+    const onKey = (e) => e.key === 'Escape' && setActiveVideo(null);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [activeVideo]);
 
   return (
     <section className="showcase-section">
       <div className="container">
         <div className="section-head text-center">
           <span className="eyebrow">Visual Feast</span>
-          <h2>A Glimpse into Our Kitchen & Masterpieces</h2>
+          <h2>A Glimpse into Our Kitchen &amp; Masterpieces</h2>
           <p className="section-sub">Explore our signature creations and craftsmanship video highlights.</p>
         </div>
 
-        {/* Mini Image Blocks (5-6 items) */}
+        {/* Picture blocks */}
         <div className="mini-blocks-grid">
           {MINI_BLOCKS.map((item, idx) => (
             <motion.div
               key={idx}
-              className="mini-card"
+              className={`mini-card mini-card--c${idx % 4}`}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: idx * 0.08 }}
             >
               <div className="mini-card__img-wrap">
-                <img src={item.src} alt={item.title} className="mini-card__img" />
+                <img src={item.src} alt={item.title} className="mini-card__img" loading="lazy" />
                 <span className="mini-card__badge">{item.tag}</span>
               </div>
               <div className="mini-card__footer">
                 <h4>{item.title}</h4>
-                <Link to="/shop" className="mini-card__link"><ArrowRight size={16} /></Link>
+                <Link to="/shop" className="mini-card__link" aria-label={`Shop ${item.title}`}><ArrowRight size={16} /></Link>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Videos Section (1 video on mobile, 2 on desktop with slide navigation & tap-to-zoom) */}
+        {/* Videos: three in a row on desktop (next three below), one swipeable row on phones */}
         <div className="videos-showcase-wrap">
           <div className="videos-header-flex">
-            <h3 className="videos-title">Kitchen Action & Craftsmanship</h3>
+            <h3 className="videos-title">Kitchen Action &amp; Craftsmanship</h3>
             <div className="video-slider-controls">
-              <button onClick={prevVideo} aria-label="Previous Video"><ChevronLeft size={20} /></button>
-              <button onClick={nextVideo} aria-label="Next Video"><ChevronRight size={20} /></button>
+              <button type="button" onClick={() => slide(-1)} aria-label="Previous video"><ChevronLeft size={20} /></button>
+              <button type="button" onClick={() => slide(1)} aria-label="Next video"><ChevronRight size={20} /></button>
             </div>
           </div>
 
-          <div className="videos-grid">
-            {/* We display current video on mobile, and 2 on desktop */}
+          <div className="videos-grid" ref={stripRef}>
             {SHOWCASE_VIDEOS.map((vid, i) => (
-              <motion.div
-                key={i}
-                className={`video-box ${i === videoIdx ? 'mobile-active-vid' : 'desktop-vid-item'}`}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                onClick={() => setActiveVideo(vid)}
-              >
-                <div className="video-player-wrap">
-                  <video src={vid.src} autoPlay loop muted playsInline className="master-video" />
-                  <div className="video-gradient-overlay" />
-                  <span className="video-tap-hint">Tap to Zoom & Play</span>
-                </div>
-                <div className="video-info">
-                  <h4>{vid.title}</h4>
-                  <p>{vid.desc}</p>
-                </div>
-              </motion.div>
+              <VideoCard key={`${vid.src}-${i}`} vid={vid} i={i} onOpen={setActiveVideo} />
             ))}
           </div>
         </div>
@@ -292,13 +343,13 @@ function MediaShowcase() {
 
       {/* Video Lightbox Modal */}
       {activeVideo && (
-        <div className="video-lightbox-overlay" onClick={() => setActiveVideo(null)}>
+        <div className="video-lightbox-overlay" onClick={() => setActiveVideo(null)} role="dialog" aria-modal="true" aria-label={activeVideo.title}>
           <div className="video-lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <button className="lightbox-close" onClick={() => setActiveVideo(null)}><X size={24} /></button>
-            <video src={activeVideo.src} controls autoPlay className="lightbox-video-player" />
+            <button type="button" className="lightbox-close" onClick={() => setActiveVideo(null)} aria-label="Close video"><X size={24} /></button>
+            <video src={activeVideo.src} controls autoPlay playsInline className="lightbox-video-player" />
             <div className="lightbox-details">
               <h3>{activeVideo.title}</h3>
-              <p>{activeVideo.desc}</p>
+              {activeVideo.desc ? <p>{activeVideo.desc}</p> : null}
             </div>
           </div>
         </div>
@@ -323,9 +374,13 @@ function Categories() {
             <Reveal as="li" key={t.name} delay={i * 0.08}>
               <Link to={`/shop?cat=${encodeURIComponent(t.name)}`} className={`tile tile--${t.tone}`}>
                 <span className="tile__img"><Img src={t.img} alt={`${t.name} snack`} compact /></span>
-                <span className="tile__name">{t.name}</span>
-                <span className="tile__note">{t.note}</span>
-                <span className="tile__go" aria-hidden="true"><ArrowRight size={20} strokeWidth={2.5} /></span>
+                <span className="tile__body">
+                  <span className="tile__text">
+                    <span className="tile__name">{t.name}</span>
+                    {t.note ? <span className="tile__note">{t.note}</span> : null}
+                  </span>
+                  <span className="tile__go" aria-hidden="true"><ArrowRight size={20} strokeWidth={2.5} /></span>
+                </span>
               </Link>
             </Reveal>
           ))}
@@ -351,7 +406,7 @@ function About() {
             <Img src={ABOUT_PHOTO} alt="Our family kitchen" />
           </Reveal>
           <Reveal className="about__text" delay={0.1}>
-            <span className="eyebrow">About Taran Hari</span>
+            <span className="eyebrow">About Taranhari</span>
             <h2>Crafted with Passion & Tradition</h2>
             {ABOUT_TEXT.map((t, idx) => <p key={idx}>{t}</p>)}
           </Reveal>
@@ -398,14 +453,16 @@ function About() {
 function Why() {
   return (
     <section className="section why-section">
-      <div className="container">
+      <span className="why__orb why__orb--a" aria-hidden="true" />
+      <span className="why__orb why__orb--b" aria-hidden="true" />
+      <div className="container why__in">
         <Reveal className="section-head text-center">
           <span className="eyebrow">The Royal Standard</span>
-          <h2>Why Choose Taran Hari?</h2>
+          <h2>Why Choose <span className="why__brand">Taranhari</span>?</h2>
         </Reveal>
         <ul className="why__grid">
           {WHY.map((w, i) => (
-            <Reveal as="li" key={w.title} delay={i * 0.08} className="wy">
+            <Reveal as="li" key={w.title} delay={i * 0.1} className={`wy wy--c${i % 4}`}>
               <span className="wy__icon"><w.icon size={28} strokeWidth={2.4} aria-hidden="true" /></span>
               <h3>{w.title}</h3>
               <p>{w.text}</p>
@@ -419,7 +476,7 @@ function Why() {
 
 /* ---------- 8. Reviews ---------- */
 function Reviews() {
-  const { home, categories, live } = useSite();
+  const { home } = useSite();
   const REVIEWS = home.reviews?.length ? home.reviews : REVIEWS_DEFAULT;
   const trackRef = useRef(null);
   const [idx, setIdx] = useState(0);
@@ -453,7 +510,8 @@ function Reviews() {
       <div className="container">
         <Reveal className="section-head text-center">
           <span className="eyebrow">Testimonials</span>
-          <h2>Loved by Crunch Fans Across India</h2>
+          <h2>Loved by Crunch Fans <span className="rev__hl">Across India</span></h2>
+          <p className="section-sub">Real words from people who made Taranhari part of their tea time.</p>
         </Reveal>
 
         <div
@@ -462,10 +520,11 @@ function Reviews() {
           onMouseLeave={() => setPaused(false)}
         >
           <ul className="reviews__track" ref={trackRef} onScroll={onScroll} tabIndex={0} aria-label="Customer reviews">
-            {REVIEWS.map((r) => (
-              <li key={r.name} className="rcard">
+            {REVIEWS.map((r, ri) => (
+              <li key={`${r.name}-${ri}`} className={`rcard rcard--c${ri % 4}`}>
+                <span className="rcard__mark" aria-hidden="true">&ldquo;</span>
                 <Stars value={r.stars} size={18} />
-                <blockquote>&ldquo;{r.quote}&rdquo;</blockquote>
+                <blockquote>{r.quote}</blockquote>
                 <div className="rcard__who">
                   <span className="rcard__avatar" aria-hidden="true">{initials(r.name)}</span>
                   <span><strong>{r.name}</strong><br /><small>{r.city}</small></span>
@@ -475,7 +534,7 @@ function Reviews() {
           </ul>
           <div className="reviews__dots" role="group" aria-label="Choose review">
             {REVIEWS.map((r, i) => (
-              <button key={r.name} type="button" className={i === idx ? 'is-on' : ''} onClick={() => goTo(i)} aria-label={`Show review ${i + 1}`} aria-current={i === idx} />
+              <button key={`${r.name}-${i}`} type="button" className={i === idx ? 'is-on' : ''} onClick={() => goTo(i)} aria-label={`Show review ${i + 1}`} aria-current={i === idx} />
             ))}
           </div>
         </div>

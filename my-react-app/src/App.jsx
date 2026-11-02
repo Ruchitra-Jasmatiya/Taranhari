@@ -1,14 +1,7 @@
-// =========================================================
-// App.jsx - providers + routes + intro gate + page transitions.
-//
-// Routes:  /  Home   /shop  Shop   /cart  Cart + Wishlist
-//          /contact  Contact
-// The Intro video is shown once per browser session
-// (sessionStorage), before the site opens.
-// =========================================================
+
 
 import { useEffect, useState } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ToastProvider } from './components/Toast.jsx';
 import { SiteProvider } from './context/SiteContext.jsx';
@@ -20,6 +13,8 @@ import Home from './pages/Home.jsx';
 import Shop from './pages/Shop.jsx';
 import Cart from './pages/Cart.jsx';
 import Contact from './pages/Contact.jsx';
+import Seo from './components/Seo.jsx';
+import { Privacy, Terms, Refund, NotFound } from './pages/Policy.jsx';
 
 const INTRO_KEY = 'taranhari-intro-seen';
 
@@ -77,6 +72,7 @@ export default function App() {
         <AnimatePresence>{showIntro && <Intro key="intro" onDone={closeIntro} />}</AnimatePresence>
 
         <ScrollToTop />
+        <Seo />
         <Navbar />
 
         <main id="main" className="page">
@@ -86,7 +82,10 @@ export default function App() {
               <Route path="/shop" element={<PageTransition><Shop /></PageTransition>} />
               <Route path="/cart" element={<PageTransition><Cart /></PageTransition>} />
               <Route path="/contact" element={<PageTransition><Contact /></PageTransition>} />
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="/privacy" element={<PageTransition><Privacy /></PageTransition>} />
+              <Route path="/terms" element={<PageTransition><Terms /></PageTransition>} />
+              <Route path="/refund" element={<PageTransition><Refund /></PageTransition>} />
+              <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
             </Routes>
           </AnimatePresence>
         </main>

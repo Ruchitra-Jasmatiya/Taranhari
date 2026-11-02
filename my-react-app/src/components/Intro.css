@@ -3,6 +3,9 @@
 .intro {
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh; /* real visible height on phones (ignores the browser bars) */
   z-index: var(--z-intro);
   display: grid;
   place-items: center;
@@ -15,8 +18,11 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover; /* the video fills the whole screen on phone and computer */
+  object-position: center;
+  background: #000;
 }
+.intro--video { background: #000; }
 
 .intro__content {
   position: relative;
