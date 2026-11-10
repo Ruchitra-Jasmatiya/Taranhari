@@ -6,7 +6,6 @@
 **Authentic Indian Delicacies • Timeless Recipes • Unforgettable Taste**
 
 <br/>
-
 <img src="https://img.shields.io/badge/BRAND-TARANHARI-8B4513?style=for-the-badge&labelColor=FFF4E6" alt="Taranhari Brand"/>
 <img src="https://img.shields.io/badge/CRAFTED_WITH-TRADITION-A65D32?style=for-the-badge&labelColor=FFF4E6" alt="Traditional Craft"/>
 <img src="https://img.shields.io/badge/EXPERIENCE-INDIAN_FLAVOURS-6B7B3E?style=for-the-badge&labelColor=FFF4E6" alt="Indian Flavours"/>
@@ -17,7 +16,7 @@
 
 </div>
 
----
+
 
 ## 🌿 About Taranhari
 
