@@ -2,7 +2,6 @@
 
 <img src="https://readme-typing-svg.demolab.com?font=Playfair+Display&weight=700&size=48&duration=3000&pause=1000&color=8B4513&center=true&vCenter=true&width=700&height=80&lines=TARANHARI;Tradition+in+Every+Bite" alt="Taranhari" />
 
-### ✨ A Taste of Tradition. A Celebration of Flavour. ✨
 
 **Authentic Indian Delicacies • Timeless Recipes • Unforgettable Taste**
 
