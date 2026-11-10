@@ -15,8 +15,6 @@
 *Where authentic Indian flavours meet a modern digital experience.*
 
 </div>
-
-
 **Taranhari** celebrates the richness of Indian culinary traditions, bringing the warmth of familiar flavours and the charm of traditional delicacies into a beautifully designed digital experience.
 
 Inspired by India's love for authentic snacks and traditional food, the website presents the brand through an inviting visual identity, thoughtful layouts, and an engaging browsing experience.
